@@ -1,5 +1,5 @@
 
-import { MessageCircle, WhatsApp } from "lucide-react";
+import { MessageCircle, MessageSquare } from "lucide-react";
 
 const Contact = () => {
   const handleConsultation = () => {
@@ -35,7 +35,7 @@ const Contact = () => {
                 onClick={handleConsultation}
                 className="cyberpunk-button flex items-center justify-center gap-2 py-3 px-6 text-lg"
               >
-                <WhatsApp size={24} /> Konsultasi Sekarang
+                <MessageSquare size={24} /> Konsultasi Sekarang
               </button>
             </div>
           </div>
