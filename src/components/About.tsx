@@ -16,7 +16,7 @@ const About = () => {
         <div className="md:flex gap-12 items-center mb-16">
           <div className="md:w-1/2 mb-8 md:mb-0">
             <div className="relative">
-              <div className="bg-dark rounded-lg p-6 border border-cyberpunk/30">
+              <div className="bg-dark/70 backdrop-blur-sm rounded-lg p-6 border border-cyberpunk/20 transition-all duration-300 hover:-translate-y-2">
                 <div className="grid grid-cols-2 gap-4 mb-8">
                   {[1, 2, 3, 4].map((num) => (
                     <div 
@@ -25,9 +25,9 @@ const About = () => {
                         num % 2 === 0 ? 'bg-cyberpunk/20' : 'bg-dark-secondary'
                       } flex items-center justify-center`}
                     >
-                      <div className={`w-12 h-12 rounded-full ${
+                      <div className={`w-10 h-10 rounded-full ${
                         num % 3 === 0 ? 'bg-cyberpunk/40' : 'bg-cyberpunk/20'  
-                      } animate-pulse`}></div>
+                      }`}></div>
                     </div>
                   ))}
                 </div>
@@ -39,8 +39,8 @@ const About = () => {
                 </div>
               </div>
               
-              <div className="absolute -top-4 -left-4 w-24 h-24 bg-cyberpunk/20 rounded-full blur-2xl"></div>
-              <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-cyberpunk/30 rounded-full blur-3xl"></div>
+              <div className="absolute -top-4 -left-4 w-24 h-24 bg-cyberpunk/10 rounded-full blur-xl"></div>
+              <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-cyberpunk/10 rounded-full blur-xl"></div>
             </div>
           </div>
           
@@ -76,7 +76,7 @@ const About = () => {
               description: "Proses transparan, komunikasi efektif, dan fokus pada hasil yang terukur dan berkelanjutan."
             }
           ].map((item, index) => (
-            <div key={index} className="cyberpunk-card">
+            <div key={index} className="bg-dark/60 backdrop-blur-sm rounded-lg p-6 border border-cyberpunk/20 transition-all duration-300 hover:-translate-y-2 hover:border-cyberpunk/40">
               <div className="mb-6">{item.icon}</div>
               <h3 className="text-xl font-semibold mb-4">{item.title}</h3>
               <p className="text-gray-300">{item.description}</p>
@@ -85,7 +85,7 @@ const About = () => {
         </div>
       </div>
       
-      <div className="absolute top-0 right-0 w-1/3 h-full bg-[radial-gradient(ellipse_at_center,rgba(155,48,255,0.1),transparent_70%)]"></div>
+      <div className="absolute top-0 right-0 w-1/3 h-full bg-[radial-gradient(ellipse_at_center,rgba(155,48,255,0.05),transparent_70%)]"></div>
     </section>
   );
 };

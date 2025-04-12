@@ -69,7 +69,7 @@ const Portfolio = () => {
               className={`px-4 py-2 rounded-full transition-all duration-300 ${
                 activeCategory === category
                   ? 'bg-cyberpunk text-white'
-                  : 'bg-dark-secondary text-gray-300 hover:text-white'
+                  : 'bg-dark-secondary text-gray-300 hover:text-white hover:bg-dark-secondary/80'
               }`}
             >
               {category}
@@ -81,26 +81,26 @@ const Portfolio = () => {
           {filteredItems.map((item, index) => (
             <div 
               key={index} 
-              className="cyberpunk-card group overflow-hidden"
+              className="bg-dark-secondary/80 backdrop-blur-sm border border-gray-800 rounded-lg overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:border-cyberpunk/30 group"
             >
-              <div className={`h-48 ${item.image} rounded-md mb-4 relative overflow-hidden group-hover:scale-105 transition-all duration-500`}>
-                <div className="absolute inset-0 bg-cyberpunk/0 group-hover:bg-cyberpunk/30 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                  <button className="bg-white text-dark p-2 rounded-full">
+              <div className={`h-48 ${item.image} rounded-t-md relative overflow-hidden`}>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
+                  <span className="px-2 py-1 text-xs rounded-full bg-cyberpunk/70 text-white">
+                    {item.category}
+                  </span>
+                </div>
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                  <button className="bg-white text-dark p-3 rounded-full transform scale-0 group-hover:scale-100 transition-all duration-300">
                     <Eye size={20} />
                   </button>
                 </div>
               </div>
-              <div className="p-4">
-                <div className="flex justify-between items-center mb-3">
-                  <h3 className="text-xl font-semibold">{item.title}</h3>
-                  <span className="px-2 py-1 text-xs rounded bg-cyberpunk/20 text-cyberpunk">
-                    {item.category}
-                  </span>
-                </div>
+              <div className="p-5">
+                <h3 className="text-xl font-semibold mb-2">{item.title}</h3>
                 <p className="text-gray-300 text-sm mb-4">{item.description}</p>
                 <Link 
                   to={`/portfolio/${index + 1}`} 
-                  className="inline-flex items-center text-cyberpunk hover:underline transition-all group-hover:translate-x-1 duration-300"
+                  className="inline-flex items-center text-cyberpunk transition-all group-hover:translate-x-1 duration-300"
                 >
                   View Details <ArrowRight size={16} className="ml-1" />
                 </Link>

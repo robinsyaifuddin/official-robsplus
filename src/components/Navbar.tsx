@@ -37,15 +37,20 @@ const Navbar = () => {
   return (
     <nav 
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
-        scrolled ? 'bg-dark-secondary/80 backdrop-blur-md py-3 shadow-lg' : 'bg-transparent py-5'
+        scrolled ? 'bg-dark-secondary/90 backdrop-blur-md py-3 shadow-lg' : 'bg-transparent py-5'
       }`}
     >
       <div className="container mx-auto px-4 flex justify-between items-center">
         <Link 
           to="/" 
-          className="text-2xl font-bold font-poppins text-white flex items-center gap-2"
+          className="text-xl font-bold font-poppins text-white flex items-center gap-2"
         >
-          <span className="text-cyberpunk">Cyber</span>Agency
+          <img 
+            src="/lovable-uploads/a67d8107-f890-4209-b488-428e15485798.png" 
+            alt="ROBsPlus Logo" 
+            className="h-10 w-auto" 
+          />
+          <span className="text-cyberpunk">ROBsPlus</span>
         </Link>
         
         {/* Desktop Navigation */}
@@ -65,7 +70,7 @@ const Navbar = () => {
           ))}
           <Link 
             to="/contact" 
-            className="cyberpunk-button animate-glow"
+            className="cyberpunk-button"
           >
             Get Started
           </Link>

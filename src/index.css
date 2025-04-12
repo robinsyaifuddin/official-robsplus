@@ -1,5 +1,5 @@
 
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -43,7 +43,7 @@
   }
 
   body {
-    @apply bg-dark text-white font-inter;
+    @apply bg-dark text-white font-poppins;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -58,13 +58,13 @@
   
   .cyberpunk-border::before {
     content: '';
-    @apply absolute inset-0 bg-gradient-to-r from-cyberpunk to-cyberpunk-light opacity-30;
-    filter: blur(8px);
+    @apply absolute inset-0 bg-gradient-to-r from-cyberpunk to-cyberpunk-light opacity-20;
+    filter: blur(6px);
     z-index: -1;
   }
   
   .cyberpunk-card {
-    @apply relative bg-dark-secondary rounded-lg p-6 overflow-hidden;
+    @apply relative bg-dark-secondary rounded-lg p-6 overflow-hidden transition-transform duration-300 hover:-translate-y-1;
   }
   
   .cyberpunk-card::after {
@@ -77,10 +77,8 @@
     @apply relative bg-cyberpunk hover:bg-cyberpunk-light text-white font-medium py-2 px-4 rounded transition-all duration-300 overflow-hidden;
   }
   
-  .cyberpunk-button::before {
-    content: '';
-    @apply absolute inset-0 bg-gradient-to-r from-cyberpunk to-cyberpunk-light opacity-0 hover:opacity-20 transition-all duration-300;
-    z-index: -1;
+  .cyberpunk-button:hover {
+    @apply translate-y-[-2px];
   }
   
   .section-padding {
@@ -94,10 +92,6 @@
   .section-title::after {
     content: '';
     @apply absolute -bottom-2 left-0 h-1 bg-cyberpunk w-1/2;
-  }
-  
-  .neon-glow {
-    text-shadow: 0 0 5px #9B30FF, 0 0 10px #9B30FF;
   }
 }
 

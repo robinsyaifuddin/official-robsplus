@@ -8,18 +8,16 @@ const Hero = () => {
       <div className="container mx-auto px-4 z-10 pt-20">
         <div className="lg:flex lg:items-center">
           <div className="lg:w-1/2 mb-12 lg:mb-0">
-            <div className="animate-float">
-              <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 leading-tight">
-                <span className="text-white">Modern Solutions for the</span> 
-                <span className="text-cyberpunk neon-glow"> Digital Age</span>
-              </h1>
-              <p className="text-lg md:text-xl text-gray-300 mb-8 max-w-2xl">
-                We create cutting-edge digital experiences that transform businesses and captivate audiences with innovative technology and stunning design.
-              </p>
-            </div>
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 leading-tight">
+              <span className="text-white">Modern Solutions for the</span><br />
+              <span className="text-cyberpunk bg-clip-text bg-gradient-to-r from-cyberpunk to-cyberpunk-light">Digital Age</span>
+            </h1>
+            <p className="text-lg md:text-xl text-gray-300 mb-8 max-w-2xl">
+              ROBsPlus adalah agensi digital penyedia layanan kebutuhan Anda dengan solusi inovatif yang mentransformasi bisnis dan memikat audiens.
+            </p>
 
             <div className="flex flex-wrap gap-4">
-              <Link to="/contact" className="cyberpunk-button flex items-center gap-2 text-lg animate-glow">
+              <Link to="/contact" className="cyberpunk-button flex items-center gap-2 text-lg">
                 Get Started <ArrowRight size={18} />
               </Link>
               <Link to="/portfolio" className="bg-transparent border border-cyberpunk text-cyberpunk hover:bg-cyberpunk/10 font-medium py-2 px-4 rounded transition-all duration-300 text-lg">
@@ -30,11 +28,11 @@ const Hero = () => {
 
           <div className="lg:w-1/2 lg:pl-12">
             <div className="relative">
-              <div className="cyberpunk-border rounded-xl bg-dark-secondary/60 backdrop-blur-sm p-8 animate-float">
+              <div className="border border-cyberpunk/30 rounded-xl bg-dark-secondary/50 backdrop-blur-lg p-8 transition-all duration-500 hover:-translate-y-2">
                 <div className="flex justify-between mb-8">
                   {[1, 2, 3].map((num) => (
                     <div key={num} className="w-12 h-12 rounded-full bg-cyberpunk/20 flex items-center justify-center">
-                      <div className="w-4 h-4 rounded-full bg-cyberpunk animate-pulse"></div>
+                      <div className="w-4 h-4 rounded-full bg-cyberpunk"></div>
                     </div>
                   ))}
                 </div>
@@ -57,8 +55,8 @@ const Hero = () => {
                 </div>
               </div>
 
-              <div className="absolute -bottom-8 -right-8 w-40 h-40 bg-cyberpunk/20 rounded-full filter blur-3xl"></div>
-              <div className="absolute -top-8 -left-8 w-40 h-40 bg-cyberpunk/20 rounded-full filter blur-3xl"></div>
+              <div className="absolute -bottom-8 -right-8 w-40 h-40 bg-cyberpunk/10 rounded-full filter blur-3xl"></div>
+              <div className="absolute -top-8 -left-8 w-40 h-40 bg-cyberpunk/10 rounded-full filter blur-3xl"></div>
             </div>
           </div>
         </div>

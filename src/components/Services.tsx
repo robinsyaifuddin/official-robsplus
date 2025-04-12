@@ -38,29 +38,36 @@ const Services = () => {
           {services.map((service, index) => (
             <div 
               key={index}
-              className="cyberpunk-card hover:translate-y-[-5px] transition-all duration-300 group"
+              className="bg-dark/60 backdrop-blur-sm border border-cyberpunk/20 rounded-lg p-6 transition-all duration-300 hover:-translate-y-2 hover:border-cyberpunk/50 group"
             >
-              <div className="p-4 bg-cyberpunk/10 inline-block rounded-lg mb-6">
-                {service.icon}
+              <div className="flex justify-between items-center mb-6">
+                <div className="p-3 bg-cyberpunk/10 rounded-lg">
+                  {service.icon}
+                </div>
+                <span className="text-xs font-medium px-3 py-1 rounded-full bg-cyberpunk/20 text-cyberpunk">
+                  {index + 1}/3
+                </span>
               </div>
-              <h3 className="text-2xl font-semibold mb-4">{service.title}</h3>
+              <h3 className="text-2xl font-semibold mb-3">{service.title}</h3>
               <p className="text-gray-300 mb-6 line-clamp-3">{service.description}</p>
               
               <ul className="mb-6 space-y-2">
                 {service.features.map((feature, idx) => (
                   <li key={idx} className="flex items-center text-gray-300">
-                    <span className="w-1.5 h-1.5 bg-cyberpunk rounded-full mr-2"></span>
+                    <div className="w-1.5 h-1.5 bg-cyberpunk rounded-full mr-2"></div>
                     {feature}
                   </li>
                 ))}
               </ul>
               
-              <Link 
-                to={`/services#${service.title.toLowerCase().replace(/\s+/g, '-')}`}
-                className="inline-flex items-center text-cyberpunk hover:underline transition-all group-hover:translate-x-1 duration-300"
-              >
-                Selengkapnya <ArrowRight size={16} className="ml-1" />
-              </Link>
+              <div className="pt-4 border-t border-gray-800 mt-auto">
+                <Link 
+                  to={`/services#${service.title.toLowerCase().replace(/\s+/g, '-')}`}
+                  className="inline-flex items-center text-cyberpunk transition-all group-hover:translate-x-1 duration-300"
+                >
+                  Selengkapnya <ArrowRight size={16} className="ml-1" />
+                </Link>
+              </div>
             </div>
           ))}
         </div>
