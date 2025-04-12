@@ -1,4 +1,3 @@
-
 import { Mail, Phone, MapPin, Send } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -46,19 +45,19 @@ const Contact = () => {
                   {
                     icon: <Mail size={24} className="text-cyberpunk" />,
                     title: "Email Kami",
-                    detail: "info@cyberagency.com",
-                    link: "mailto:info@cyberagency.com"
+                    detail: "hello.robsplus@gmail.com",
+                    link: "mailto:hello.robsplus@gmail.com"
                   },
                   {
                     icon: <Phone size={24} className="text-cyberpunk" />,
                     title: "Hubungi Kami",
-                    detail: "+62 123 4567 890",
-                    link: "tel:+6212345678890"
+                    detail: "+62 85768192419",
+                    link: "tel:+6285768192419"
                   },
                   {
                     icon: <MapPin size={24} className="text-cyberpunk" />,
                     title: "Lokasi Kami",
-                    detail: "Jl. Cyber No. 123, Jakarta, Indonesia",
+                    detail: "Way Kandis, Bandar Lampung, Indonesia",
                     link: "#"
                   }
                 ].map((item, index) => (

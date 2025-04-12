@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -81,22 +80,22 @@ const ContactPage = () => {
                 {
                   icon: <Mail size={32} className="text-cyberpunk" />,
                   title: "Email Kami",
-                  detail: "info@cyberagency.com",
+                  detail: "hello.robsplus@gmail.com",
                   description: "Kami akan merespon dalam 24 jam",
-                  link: "mailto:info@cyberagency.com"
+                  link: "mailto:hello.robsplus@gmail.com"
                 },
                 {
                   icon: <Phone size={32} className="text-cyberpunk" />,
                   title: "Hubungi Kami",
-                  detail: "+62 123 4567 890",
+                  detail: "+62 85768192419",
                   description: "Senin - Jumat, 9:00 - 17:00",
-                  link: "tel:+6212345678890"
+                  link: "tel:+6285768192419"
                 },
                 {
                   icon: <MapPin size={32} className="text-cyberpunk" />,
                   title: "Lokasi Kami",
-                  detail: "Jl. Cyber No. 123, Jakarta",
-                  description: "Indonesia, 12345",
+                  detail: "Way Kandis, Bandar Lampung",
+                  description: "Indonesia",
                   link: "https://maps.google.com"
                 }
               ].map((item, index) => (
@@ -286,7 +285,7 @@ const ContactPage = () => {
               <div className="absolute inset-0 bg-dark-secondary/60 flex items-center justify-center">
                 <div className="text-center">
                   <h3 className="text-2xl font-bold mb-4">Lokasi Kami</h3>
-                  <p className="text-gray-300 mb-6">Jl. Cyber No. 123, Jakarta, Indonesia, 12345</p>
+                  <p className="text-gray-300 mb-6">Way Kandis, Bandar Lampung, Indonesia</p>
                   <a 
                     href="https://maps.google.com" 
                     target="_blank" 

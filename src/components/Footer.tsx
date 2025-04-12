@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { ChevronRight, Mail, Instagram, Globe, MessageSquare } from "lucide-react";
 import {
@@ -83,46 +82,46 @@ const Footer = () => {
               Menyediakan solusi digital terdepan untuk membantu bisnis Anda berkembang di era modern dengan pendekatan yang inovatif dan efektif.
             </p>
             <div className="flex gap-4">
-              <a 
-                href="mailto:hello.robsplus@gmail.com" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-dark flex items-center justify-center hover:bg-cyberpunk transition-all duration-300 transform hover:scale-110"
-                aria-label="Email"
-              >
-                <Mail className="w-5 h-5 text-white" />
-              </a>
-              <a 
-                href="https://wa.me/6285768192419" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-dark flex items-center justify-center hover:bg-cyberpunk transition-all duration-300 transform hover:scale-110"
-                aria-label="WhatsApp"
-              >
-                <MessageSquare className="w-5 h-5 text-white" />
-              </a>
-              <a 
-                href="https://instagram.com/ofc.robsplus" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-dark flex items-center justify-center hover:bg-cyberpunk transition-all duration-300 transform hover:scale-110"
-                aria-label="Instagram"
-              >
-                <Instagram className="w-5 h-5 text-white" />
-              </a>
-              <a 
-                href="https://robsplus.web.id" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-dark flex items-center justify-center hover:bg-cyberpunk transition-all duration-300 transform hover:scale-110"
-                aria-label="Website"
-              >
-                <Globe className="w-5 h-5 text-white" />
-              </a>
+              {[
+                {
+                  icon: <Mail className="w-5 h-5 text-white" />,
+                  title: "Email Kami",
+                  detail: "hello.robsplus@gmail.com",
+                  link: "mailto:hello.robsplus@gmail.com"
+                },
+                {
+                  icon: <MessageSquare className="w-5 h-5 text-white" />,
+                  title: "Hubungi Kami",
+                  detail: "+62 85768192419",
+                  link: "https://wa.me/6285768192419"
+                },
+                {
+                  icon: <Instagram className="w-5 h-5 text-white" />,
+                  title: "Instagram",
+                  detail: "ofc.robsplus",
+                  link: "https://instagram.com/ofc.robsplus"
+                },
+                {
+                  icon: <Globe className="w-5 h-5 text-white" />,
+                  title: "Website",
+                  detail: "robsplus.web.id",
+                  link: "https://robsplus.web.id"
+                }
+              ].map((item) => (
+                <a 
+                  href={item.link} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 rounded-full bg-dark flex items-center justify-center hover:bg-cyberpunk transition-all duration-300 transform hover:scale-110"
+                  aria-label={item.title}
+                >
+                  {item.icon}
+                </a>
+              ))}
             </div>
             <div className="mt-6">
               <p className="text-gray-300">
-                <strong>Lokasi:</strong> Way Kandis, Bandar Lampung, Indonesia 35143
+                <strong>Lokasi:</strong> Way Kandis, Bandar Lampung, Indonesia
               </p>
             </div>
           </div>
