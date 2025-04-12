@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { MessageSquare, X, Send } from "lucide-react";
+import { MessageSquare, X, Send, Bot } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -42,10 +42,10 @@ const ChatBot = () => {
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetTrigger asChild>
           <button 
-            className="w-14 h-14 rounded-full bg-cyberpunk flex items-center justify-center shadow-lg hover:bg-cyberpunk-light transition-all duration-300"
-            aria-label="Open chat"
+            className="w-14 h-14 rounded-full bg-cyberpunk flex items-center justify-center shadow-lg hover:bg-cyberpunk-light transition-all duration-300 animate-pulse-light"
+            aria-label="Chat dengan AI Assistant"
           >
-            <MessageSquare className="text-white" size={24} />
+            <Bot className="text-white" size={24} />
           </button>
         </SheetTrigger>
         <SheetContent className="w-[90%] sm:w-[380px] h-[500px] sm:h-[600px] p-0 flex flex-col bg-dark-secondary border-l border-cyberpunk/30">
@@ -53,7 +53,7 @@ const ChatBot = () => {
             <div className="flex justify-between items-center w-full">
               <div className="flex items-center gap-2">
                 <div className="w-10 h-10 rounded-full bg-cyberpunk flex items-center justify-center">
-                  <MessageSquare className="text-white" size={18} />
+                  <Bot className="text-white" size={18} />
                 </div>
                 <div>
                   <SheetTitle className="text-white text-left">ROBsPlus Assistant</SheetTitle>
