@@ -1,4 +1,4 @@
-
+import React, { useState } from 'react';
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
@@ -9,7 +9,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { useState } from "react";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import {
@@ -72,8 +71,8 @@ const Hero = () => {
         <div className="lg:flex lg:items-center">
           <div className="lg:w-1/2 mb-12 lg:mb-0">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 leading-tight">
-              <span className="text-white">Modern Solutions for the</span><br />
-              <span className="text-cyberpunk bg-clip-text bg-gradient-to-r from-cyberpunk to-cyberpunk-light">Digital Age</span>
+              <span className="text-white">Layanan Terbaik</span><br />
+              <span className="text-cyberpunk bg-clip-text bg-gradient-to-r from-cyberpunk to-cyberpunk-light">Penuhi Kebutuhan Anda</span>
             </h1>
             <p className="text-lg md:text-xl text-gray-300 mb-8 max-w-2xl">
               ROBsPlus adalah agensi digital penyedia layanan kebutuhan Anda dengan solusi inovatif yang mentransformasi bisnis dan memikat audiens.
