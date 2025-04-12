@@ -46,7 +46,7 @@ const Navbar = () => {
           className="text-xl font-bold font-poppins text-white flex items-center gap-2"
         >
           <img 
-            src="/lovable-uploads/a67d8107-f890-4209-b488-428e15485798.png" 
+            src="/lovable-uploads/3fb5da8a-be09-49f5-8f5e-cfe405af7e9e.png" 
             alt="ROBsPlus Logo" 
             className="h-10 w-auto" 
           />
