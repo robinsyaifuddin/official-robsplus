@@ -23,14 +23,14 @@ const AdminLogin = () => {
   const [showErrorDialog, setShowErrorDialog] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
-  const { signIn, user } = useAuth();
+  const { signIn, user, isAdmin } = useAuth();
 
   useEffect(() => {
     // Redirect to dashboard if already logged in
-    if (user) {
+    if (user && isAdmin()) {
       navigate('/admin/dashboard');
     }
-  }, [user, navigate]);
+  }, [user, navigate, isAdmin]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

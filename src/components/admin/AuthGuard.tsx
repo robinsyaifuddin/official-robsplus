@@ -9,7 +9,7 @@ interface AuthGuardProps {
 }
 
 const AuthGuard = ({ children }: AuthGuardProps) => {
-  const { user, loading } = useAuth();
+  const { user, loading, isAdmin } = useAuth();
   const location = useLocation();
   const [isChecking, setIsChecking] = useState(true);
 
@@ -36,11 +36,14 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
     );
   }
 
-  if (!user) {
+  // Verify if the user is logged in and is an admin
+  if (!user || !isAdmin()) {
+    console.log("Not authenticated or not admin, redirecting to login");
     // Redirect to login if not authenticated
     return <Navigate to="/admin" state={{ from: location }} replace />;
   }
 
+  console.log("User authenticated and is admin, rendering children");
   return <>{children}</>;
 };
 

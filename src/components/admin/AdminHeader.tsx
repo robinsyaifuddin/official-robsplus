@@ -33,7 +33,7 @@ const AdminHeader = () => {
       
       <div className="flex items-center space-x-2">
         <div className="text-sm text-gray-400">
-          {user?.email}
+          {user?.email || 'robsplus.admin@gmail.com'}
         </div>
         
         <Button
