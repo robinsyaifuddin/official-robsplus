@@ -21,6 +21,7 @@ import PortfolioManagement from "./pages/admin/PortfolioManagement";
 import UsersManagement from "./pages/admin/UsersManagement";
 import WebsiteSettings from "./pages/admin/WebsiteSettings";
 import IntegrationAdmin from "./pages/admin/IntegrationAdmin";
+import AuthGuard from "./components/admin/AuthGuard";
 
 const queryClient = new QueryClient();
 
@@ -40,7 +41,11 @@ const App = () => (
           
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminLogin />} />
-          <Route path="/admin/dashboard" element={<AdminLayout />}>
+          <Route path="/admin/dashboard" element={
+            <AuthGuard>
+              <AdminLayout />
+            </AuthGuard>
+          }>
             <Route index element={<Dashboard />} />
             <Route path="pages" element={<PagesManagement />} />
             <Route path="products" element={<ProductsManagement />} />

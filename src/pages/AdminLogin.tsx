@@ -1,11 +1,13 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 
 const AdminLogin = () => {
   const [email, setEmail] = useState("");
@@ -13,34 +15,40 @@ const AdminLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { signIn, user } = useAuth();
 
-  const handleLogin = (e: React.FormEvent) => {
+  useEffect(() => {
+    // Redirect to dashboard if already logged in
+    if (user) {
+      navigate('/admin/dashboard');
+    }
+  }, [user, navigate]);
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Hard-coded credentials (will be replaced with Supabase auth)
-    if (email === "robsplus.admin@gmail.com" && password === "robsplus@123") {
-      // Set admin auth in localStorage (temporary - will be replaced with Supabase auth)
-      localStorage.setItem("robsplus_admin_auth", JSON.stringify({
-        isAdmin: true,
-        email: email,
-        loginTime: new Date().toISOString(),
-      }));
+    try {
+      const { data, error } = await signIn(email, password);
       
-      setTimeout(() => {
-        toast.success("Login berhasil", {
-          description: "Selamat datang di dashboard admin ROBsPlus"
-        });
-        navigate("/admin/dashboard");
-        setIsLoading(false);
-      }, 1000);
-    } else {
-      setTimeout(() => {
+      if (error) {
         toast.error("Login gagal", {
-          description: "Email atau kata sandi tidak valid"
+          description: error.message || "Email atau kata sandi tidak valid"
         });
         setIsLoading(false);
-      }, 1000);
+        return;
+      }
+      
+      toast.success("Login berhasil", {
+        description: "Selamat datang di dashboard admin ROBsPlus"
+      });
+      navigate("/admin/dashboard");
+    } catch (error: any) {
+      toast.error("Login gagal", {
+        description: error.message || "Terjadi kesalahan saat mencoba login"
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
