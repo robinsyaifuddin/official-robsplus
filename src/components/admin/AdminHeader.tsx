@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { LogOut, User } from 'lucide-react';
+import { LogOut, User, Shield } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
@@ -32,6 +32,16 @@ const AdminHeader = () => {
       </div>
       
       <div className="flex items-center space-x-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => navigate('/admin/generate-token')}
+          className="text-gray-400 hover:bg-gray-800 hover:text-white"
+        >
+          <Shield className="mr-2 h-4 w-4 text-cyberpunk" />
+          Setup URL
+        </Button>
+
         <div className="text-sm text-gray-400">
           {user?.email || 'robsplus.admin@gmail.com'}
         </div>

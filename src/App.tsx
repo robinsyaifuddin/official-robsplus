@@ -22,6 +22,8 @@ import UsersManagement from "./pages/admin/UsersManagement";
 import WebsiteSettings from "./pages/admin/WebsiteSettings";
 import IntegrationAdmin from "./pages/admin/IntegrationAdmin";
 import AuthGuard from "./components/admin/AuthGuard";
+import SetupAdmin from "./pages/SetupAdmin";
+import GenerateSetupToken from "./pages/GenerateSetupToken";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +41,9 @@ const App = () => (
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
           
+          {/* Setup Admin Route */}
+          <Route path="/setup-admin" element={<SetupAdmin />} />
+          
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminLogin />} />
           <Route path="/admin/dashboard" element={
@@ -53,6 +58,7 @@ const App = () => (
             <Route path="users" element={<UsersManagement />} />
             <Route path="website" element={<WebsiteSettings />} />
             <Route path="integration" element={<IntegrationAdmin />} />
+            <Route path="generate-token" element={<GenerateSetupToken />} />
           </Route>
           
           {/* Not Found */}
