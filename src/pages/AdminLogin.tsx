@@ -7,13 +7,21 @@ import { toast } from "sonner";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogDescription, 
+  DialogHeader, 
+  DialogTitle 
+} from "@/components/ui/dialog";
 
 const AdminLogin = () => {
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState("robsplus.admin@gmail.com");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showErrorDialog, setShowErrorDialog] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
   const { signIn, user } = useAuth();
 
@@ -29,9 +37,13 @@ const AdminLogin = () => {
     setIsLoading(true);
     
     try {
+      console.log("Login attempt with:", email, password);
       const { data, error } = await signIn(email, password);
       
       if (error) {
+        console.error("Login error:", error);
+        setErrorMessage(error.message || "Email atau kata sandi tidak valid");
+        setShowErrorDialog(true);
         toast.error("Login gagal", {
           description: error.message || "Email atau kata sandi tidak valid"
         });
@@ -44,6 +56,9 @@ const AdminLogin = () => {
       });
       navigate("/admin/dashboard");
     } catch (error: any) {
+      console.error("Unexpected error:", error);
+      setErrorMessage(error.message || "Terjadi kesalahan saat mencoba login");
+      setShowErrorDialog(true);
       toast.error("Login gagal", {
         description: error.message || "Terjadi kesalahan saat mencoba login"
       });
@@ -120,6 +135,25 @@ const AdminLogin = () => {
           <p className="text-sm text-gray-400">© 2025 ROBsPlus. All rights reserved.</p>
         </CardFooter>
       </Card>
+
+      <Dialog open={showErrorDialog} onOpenChange={setShowErrorDialog}>
+        <DialogContent className="bg-dark border border-gray-700 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-xl text-white">Login gagal</DialogTitle>
+            <DialogDescription className="text-gray-400">
+              {errorMessage}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-4 flex justify-end">
+            <Button 
+              onClick={() => setShowErrorDialog(false)}
+              className="bg-cyberpunk hover:bg-cyberpunk-light"
+            >
+              Tutup
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

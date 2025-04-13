@@ -30,6 +30,7 @@ export const useAuth = () => {
   }, []);
 
   const signIn = async (email: string, password: string) => {
+    console.log("Attempting to sign in with:", email);
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -37,6 +38,7 @@ export const useAuth = () => {
       });
       
       if (error) throw error;
+      console.log("Sign in successful:", data);
       return { data, error: null };
     } catch (error: any) {
       console.error('Error signing in:', error.message);
