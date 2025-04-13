@@ -6,77 +6,26 @@ import {
   BarChart, Users, ShoppingCart, Image, TrendingUp, ArrowUpRight, 
   ArrowDownRight, Eye, Clock, Calendar
 } from 'lucide-react';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-} from 'chart.js';
-import { Bar } from 'react-chartjs-2';
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
+import { 
+  BarChart as RechartsBarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer 
+} from 'recharts';
 
 const Dashboard = () => {
   // Mock data for visitors chart
-  const visitorsData = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-    datasets: [
-      {
-        label: 'Pengunjung',
-        data: [450, 520, 490, 670, 730, 890],
-        backgroundColor: '#9B30FF',
-        borderColor: '#9B30FF',
-        borderWidth: 1,
-        borderRadius: 4,
-      },
-    ],
-  };
-
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        display: true,
-        position: 'top' as const,
-        labels: {
-          color: '#ffffff',
-        },
-      },
-      tooltip: {
-        mode: 'index' as const,
-        intersect: false,
-      },
-    },
-    scales: {
-      x: {
-        grid: {
-          color: 'rgba(255, 255, 255, 0.1)',
-        },
-        ticks: {
-          color: '#ffffff',
-        },
-      },
-      y: {
-        grid: {
-          color: 'rgba(255, 255, 255, 0.1)',
-        },
-        ticks: {
-          color: '#ffffff',
-        },
-      },
-    },
-  };
+  const visitorsData = [
+    { month: 'Jan', visitors: 450 },
+    { month: 'Feb', visitors: 520 },
+    { month: 'Mar', visitors: 490 },
+    { month: 'Apr', visitors: 670 },
+    { month: 'May', visitors: 730 },
+    { month: 'Jun', visitors: 890 },
+  ];
 
   // Mock data for recent activities
   const recentActivities = [
@@ -172,7 +121,21 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="h-80">
-              <Bar data={visitorsData} options={chartOptions} />
+              <ResponsiveContainer width="100%" height="100%">
+                <RechartsBarChart data={visitorsData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.1)" />
+                  <XAxis dataKey="month" stroke="#ffffff" />
+                  <YAxis stroke="#ffffff" />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: '#1f1f1f', 
+                      border: '1px solid #333' 
+                    }}
+                    labelStyle={{ color: '#fff' }}
+                  />
+                  <Bar dataKey="visitors" fill="#9B30FF" radius={4} />
+                </RechartsBarChart>
+              </ResponsiveContainer>
             </div>
           </CardContent>
         </Card>

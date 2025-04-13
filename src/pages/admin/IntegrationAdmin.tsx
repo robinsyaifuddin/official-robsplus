@@ -10,7 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { 
   Database, Key, Lock, ShieldCheck, Server, Globe, RefreshCw,
-  CheckCircle2, Info, AlertCircle, MailCheck, CheckCheck, Upload, FileText
+  CheckCircle2, Info, AlertCircle, MailCheck, CheckCheck, Upload, FileText,
+  Plus, Settings
 } from 'lucide-react';
 import { toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
