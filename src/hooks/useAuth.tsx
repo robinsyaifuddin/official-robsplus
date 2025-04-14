@@ -49,12 +49,28 @@ export const useAuth = () => {
       console.log("Manual admin session found in localStorage");
       setIsAdminState(true);
       if (!user) {
-        setUser({
+        // Create a custom user object with required User properties
+        const customUser = {
           id: '00000000-0000-0000-0000-000000000000',
           email: 'robsplus.admin@gmail.com',
           app_metadata: { provider: 'custom' },
-          user_metadata: { is_admin: true }
-        } as User);
+          user_metadata: { is_admin: true },
+          // Add required properties from User type
+          aud: 'authenticated',
+          created_at: new Date().toISOString(),
+          // Additional required properties with default values
+          role: '',
+          updated_at: new Date().toISOString(),
+          confirmation_sent_at: null,
+          confirmed_at: new Date().toISOString(),
+          last_sign_in_at: new Date().toISOString(),
+          factors: null,
+          identities: [],
+          phone: '',
+          recovery_sent_at: null,
+        } as User;
+        
+        setUser(customUser);
       }
     }
 
@@ -81,16 +97,29 @@ export const useAuth = () => {
           // Set manual admin session in localStorage
           localStorage.setItem('manual_admin_session', 'true');
           
-          // Create a manual user object
+          // Create a custom user object with required User properties
           const customUser = {
             id: '00000000-0000-0000-0000-000000000000',
             email: 'robsplus.admin@gmail.com',
             app_metadata: { provider: 'custom' },
-            user_metadata: { is_admin: true }
-          };
+            user_metadata: { is_admin: true },
+            // Add required properties from User type
+            aud: 'authenticated',
+            created_at: new Date().toISOString(),
+            // Additional required properties with default values
+            role: '',
+            updated_at: new Date().toISOString(),
+            confirmation_sent_at: null,
+            confirmed_at: new Date().toISOString(),
+            last_sign_in_at: new Date().toISOString(),
+            factors: null,
+            identities: [],
+            phone: '',
+            recovery_sent_at: null,
+          } as User;
           
           // Set user and admin state manually
-          setUser(customUser as User);
+          setUser(customUser);
           setIsAdminState(true);
           
           return { 
