@@ -28,7 +28,8 @@ const AdminLogin = () => {
   useEffect(() => {
     // Redirect to dashboard if already logged in
     if (user && isAdmin()) {
-      navigate('/admin/dashboard');
+      console.log("User already logged in as admin, redirecting to dashboard");
+      navigate('/admin/dashboard', { replace: true });
     }
   }, [user, navigate, isAdmin]);
 
@@ -54,10 +55,15 @@ const AdminLogin = () => {
           return;
         }
         
+        console.log("Admin login successful, redirecting to dashboard");
         toast.success("Login berhasil", {
           description: "Selamat datang di dashboard admin ROBsPlus"
         });
-        navigate("/admin/dashboard");
+        
+        // Use setTimeout to ensure state updates before navigation
+        setTimeout(() => {
+          navigate("/admin/dashboard", { replace: true });
+        }, 500);
         return;
       }
       
@@ -75,10 +81,15 @@ const AdminLogin = () => {
         return;
       }
       
+      console.log("Login successful, redirecting to dashboard");
       toast.success("Login berhasil", {
         description: "Selamat datang di dashboard admin ROBsPlus"
       });
-      navigate("/admin/dashboard");
+      
+      // Use setTimeout to ensure state updates before navigation
+      setTimeout(() => {
+        navigate("/admin/dashboard", { replace: true });
+      }, 500);
     } catch (error: any) {
       console.error("Unexpected error:", error);
       setErrorMessage(error.message || "Terjadi kesalahan saat mencoba login");

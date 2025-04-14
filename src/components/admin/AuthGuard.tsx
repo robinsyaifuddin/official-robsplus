@@ -1,8 +1,9 @@
 
 import { ReactNode, useEffect, useState } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface AuthGuardProps {
   children: ReactNode;
@@ -11,19 +12,32 @@ interface AuthGuardProps {
 const AuthGuard = ({ children }: AuthGuardProps) => {
   const { user, loading, isAdmin } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
     // Wait for authentication to complete
     if (!loading) {
+      console.log("Auth state loaded, checking admin status:", { 
+        user: user, 
+        isAdmin: isAdmin() 
+      });
+      
       // Set a small delay to ensure auth state is fully processed
       const timer = setTimeout(() => {
+        if (!user || !isAdmin()) {
+          console.log("Not authenticated as admin, redirecting to login");
+          toast.error("Autentikasi diperlukan", {
+            description: "Silakan login sebagai admin untuk mengakses halaman ini"
+          });
+          navigate("/admin", { replace: true });
+        }
         setIsChecking(false);
-      }, 500);
+      }, 800);
       
       return () => clearTimeout(timer);
     }
-  }, [loading]);
+  }, [loading, user, isAdmin, navigate]);
 
   if (isChecking || loading) {
     return (
