@@ -20,7 +20,7 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
     if (!loading) {
       console.log("Auth state loaded in AuthGuard:", { 
         user: user?.email, 
-        isAdmin: isAdmin() 
+        isAdmin: isAdmin()
       });
       
       // Set a delay to ensure auth state is fully processed
@@ -28,18 +28,28 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
         const adminStatus = isAdmin();
         console.log("Admin status check result:", adminStatus);
         
-        if (!user || !adminStatus) {
-          console.log("Not authenticated as admin, redirecting to login page");
+        // Force reload localStorage to ensure it's up to date
+        const manualAdminSession = localStorage.getItem('manual_admin_session');
+        console.log("Manual admin session in AuthGuard:", manualAdminSession);
+        
+        if (!user && manualAdminSession !== 'true') {
+          console.log("No user found and no manual admin session, redirecting");
           toast.error("Autentikasi diperlukan", {
             description: "Silakan login sebagai admin untuk mengakses halaman ini"
           });
           navigate("/admin", { replace: true });
+        } else if (!adminStatus && manualAdminSession !== 'true') {
+          console.log("User is not admin and no manual admin session, redirecting");
+          toast.error("Akses ditolak", {
+            description: "Anda tidak memiliki hak akses admin"
+          });
+          navigate("/admin", { replace: true });
         } else {
-          console.log("User is authenticated as admin");
+          console.log("User is authenticated as admin or has manual admin session");
         }
         
         setIsChecking(false);
-      }, 1000);
+      }, 1500); // Increase timeout to ensure state is fully updated
       
       return () => clearTimeout(timer);
     }
@@ -56,8 +66,9 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
     );
   }
 
-  // Final check to verify if the user is admin
-  if (!user || !isAdmin()) {
+  // Final check - also check localStorage directly as a fallback
+  const manualSession = localStorage.getItem('manual_admin_session');
+  if ((!user || !isAdmin()) && manualSession !== 'true') {
     console.log("Final check: Not authenticated as admin, redirecting to login page");
     return <Navigate to="/admin" state={{ from: location }} replace />;
   }

@@ -125,7 +125,7 @@ export const useAuth = () => {
           return { 
             data: { 
               user: customUser, 
-              session: { user: customUser } 
+              session: { user: customUser } as unknown as Session 
             }, 
             error: null 
           };

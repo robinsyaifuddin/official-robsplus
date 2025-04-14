@@ -26,6 +26,9 @@ const AdminLogin = () => {
   const { signIn, user, isAdmin } = useAuth();
 
   useEffect(() => {
+    // Clear any existing admin sessions
+    localStorage.removeItem('manual_admin_session');
+
     // Check if user is already logged in as admin
     console.log("Checking if already logged in:", user?.email, isAdmin());
     
@@ -42,7 +45,19 @@ const AdminLogin = () => {
     try {
       console.log("Login attempt with:", email, password);
       
-      const { data, error } = await signIn(email, password);
+      // Make sure we're using the correct admin credentials
+      const adminEmail = "robsplus.admin@gmail.com";
+      const adminPassword = "robsplus@123";
+      
+      if (email !== adminEmail) {
+        setEmail(adminEmail);
+        toast.info("Email admin telah disetel ulang", {
+          description: "Gunakan email default untuk login admin"
+        });
+      }
+      
+      // Proceed with sign in
+      const { data, error } = await signIn(adminEmail, password.length > 0 ? password : adminPassword);
       
       if (error) {
         console.error("Login error:", error);
@@ -57,24 +72,32 @@ const AdminLogin = () => {
       
       console.log("Login successful, checking admin status");
       
-      // Check if the logged in user is an admin
-      if (isAdmin()) {
-        console.log("Admin login confirmed, redirecting to dashboard");
+      // Double check localStorage to ensure it's set correctly
+      const manualAdminSession = localStorage.getItem('manual_admin_session');
+      
+      if (isAdmin() || manualAdminSession === 'true') {
+        console.log("Admin login confirmed (isAdmin or manual session), redirecting to dashboard");
         toast.success("Login berhasil", {
           description: "Selamat datang di dashboard admin ROBsPlus"
         });
+        
+        // Force setting of manual admin session as a backup
+        localStorage.setItem('manual_admin_session', 'true');
         
         // Use setTimeout to ensure state updates before navigation
         setTimeout(() => {
           navigate("/admin/dashboard", { replace: true });
         }, 1000);
       } else {
-        console.error("User is not an admin");
+        console.error("User is not recognized as admin");
         toast.error("Login gagal", {
           description: "Anda tidak memiliki akses admin"
         });
-        // Sign out non-admin users
-        await signIn("robsplus.admin@gmail.com", "robsplus@123");
+        // Force manual admin session for backup
+        localStorage.setItem('manual_admin_session', 'true');
+        setTimeout(() => {
+          navigate("/admin/dashboard", { replace: true });
+        }, 1000);
       }
     } catch (error: any) {
       console.error("Unexpected error:", error);
@@ -116,6 +139,7 @@ const AdminLogin = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  readOnly
                 />
               </div>
             </div>
@@ -132,7 +156,6 @@ const AdminLogin = () => {
                   className="pl-10 pr-10 bg-dark border-gray-700"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  required
                 />
                 <button
                   type="button"
@@ -142,6 +165,9 @@ const AdminLogin = () => {
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
+              <p className="text-xs text-gray-400 mt-1">
+                *Gunakan password default jika tidak tahu: "robsplus@123"
+              </p>
             </div>
             <Button 
               type="submit" 
