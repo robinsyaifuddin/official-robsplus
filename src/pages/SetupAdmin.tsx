@@ -68,7 +68,12 @@ const SetupAdmin = () => {
         
         // Safely validate and access token settings
         if (settings && settings.value && isValidTokenSettings(settings.value)) {
-          if (settings.value.token === token && !settings.value.used) {
+          const tokenData = settings.value;
+          // Use safe property access with type checking
+          if (typeof tokenData.token === 'string' && 
+              typeof tokenData.used === 'boolean' && 
+              tokenData.token === token && 
+              !tokenData.used) {
             setTokenValid(true);
           } else {
             toast.error("Token tidak valid atau sudah digunakan");
