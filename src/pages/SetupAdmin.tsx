@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -6,15 +7,26 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Eye, EyeOff, Lock, Mail, User, Shield, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { Json } from '@/integrations/supabase/types';
 
 const TOKEN_KEY = "setup_admin_token";
 
+// Define the token settings interface
 interface TokenSettings {
   token: string;
   used: boolean;
   admin_id?: string;
   created_at?: string;
 }
+
+// Helper function to safely validate token settings
+const isValidTokenSettings = (value: Json): value is TokenSettings => {
+  return typeof value === 'object' && 
+         value !== null && 
+         !Array.isArray(value) &&
+         'token' in value && 
+         'used' in value;
+};
 
 const SetupAdmin = () => {
   const [searchParams] = useSearchParams();
@@ -53,12 +65,15 @@ const SetupAdmin = () => {
           throw settingsError;
         }
         
-        const settingsValue = settings.value as TokenSettings;
-        
-        if (settings && settingsValue && settingsValue.token === token && !settingsValue.used) {
-          setTokenValid(true);
+        // Safely validate and access token settings
+        if (settings && settings.value && isValidTokenSettings(settings.value)) {
+          if (settings.value.token === token && !settings.value.used) {
+            setTokenValid(true);
+          } else {
+            toast.error("Token tidak valid atau sudah digunakan");
+          }
         } else {
-          toast.error("Token tidak valid atau sudah digunakan");
+          toast.error("Format token tidak valid");
         }
       } catch (error) {
         console.error("Error verifying token:", error);
@@ -102,12 +117,20 @@ const SetupAdmin = () => {
         throw adminError;
       }
       
+      // Update token as used, with proper type casting
+      const tokenSettings: TokenSettings = {
+        token, 
+        used: true, 
+        admin_id: admin.id, 
+        created_at: new Date().toISOString()
+      };
+      
       const { error: tokenError } = await supabase
         .from('settings')
         .upsert([
           { 
             id: TOKEN_KEY, 
-            value: { token, used: true, admin_id: admin.id, created_at: new Date().toISOString() }
+            value: tokenSettings as unknown as Json
           }
         ]);
       

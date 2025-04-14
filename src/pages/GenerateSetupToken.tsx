@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,9 +8,11 @@ import { Shield, Copy, CheckCircle2 } from "lucide-react";
 import { useAuth } from '@/hooks/useAuth';
 import { Navigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { Json } from '@/integrations/supabase/types';
 
 const TOKEN_KEY = "setup_admin_token";
 
+// Define the token settings interface to match the Json structure
 interface TokenSettings {
   token: string;
   used: boolean;
@@ -37,18 +40,20 @@ const GenerateSetupToken = () => {
         .map(b => b.toString(16).padStart(2, "0"))
         .join("");
       
+      // Create token settings object
       const tokenSettings: TokenSettings = {
         token: newToken,
         used: false,
         created_at: new Date().toISOString()
       };
       
+      // Use type assertion to tell TypeScript this is a valid Json type
       const { error } = await supabase
         .from('settings')
         .upsert([
           { 
             id: TOKEN_KEY, 
-            value: tokenSettings
+            value: tokenSettings as unknown as Json
           }
         ]);
       
