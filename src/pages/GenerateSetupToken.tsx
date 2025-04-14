@@ -12,7 +12,7 @@ import { Json } from '@/integrations/supabase/types';
 
 const TOKEN_KEY = "setup_admin_token";
 
-// Define the token settings interface to match the Json structure
+// Define the token settings interface
 interface TokenSettings {
   token: string;
   used: boolean;

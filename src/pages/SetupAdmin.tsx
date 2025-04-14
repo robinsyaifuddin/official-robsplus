@@ -20,7 +20,8 @@ interface TokenSettings {
 }
 
 // Helper function to safely validate token settings
-const isValidTokenSettings = (value: Json): value is TokenSettings => {
+// Use a proper type guard that checks if the value has the required properties
+const isValidTokenSettings = (value: Json): value is Record<string, any> => {
   return typeof value === 'object' && 
          value !== null && 
          !Array.isArray(value) &&
