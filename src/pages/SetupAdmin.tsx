@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -69,8 +68,11 @@ const SetupAdmin = () => {
         // Safely validate and access token settings
         if (settings && settings.value && isValidTokenSettings(settings.value)) {
           const tokenData = settings.value;
-          // Use safe property access with type checking
-          if (typeof tokenData.token === 'string' && 
+          
+          // Validate token data properties exist and have the correct types
+          if ('token' in tokenData && 
+              'used' in tokenData &&
+              typeof tokenData.token === 'string' && 
               typeof tokenData.used === 'boolean' && 
               tokenData.token === token && 
               !tokenData.used) {
