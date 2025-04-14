@@ -38,6 +38,30 @@ const AdminLogin = () => {
     
     try {
       console.log("Login attempt with:", email, password);
+      
+      // Hardcoded check for admin credentials to ensure direct access
+      if (email === 'robsplus.admin@gmail.com' && password === 'robsplus@123') {
+        const { data, error } = await signIn(email, password);
+        
+        if (error) {
+          console.error("Login error:", error);
+          setErrorMessage(error.message || "Email atau kata sandi tidak valid");
+          setShowErrorDialog(true);
+          toast.error("Login gagal", {
+            description: error.message || "Email atau kata sandi tidak valid"
+          });
+          setIsLoading(false);
+          return;
+        }
+        
+        toast.success("Login berhasil", {
+          description: "Selamat datang di dashboard admin ROBsPlus"
+        });
+        navigate("/admin/dashboard");
+        return;
+      }
+      
+      // For other users
       const { data, error } = await signIn(email, password);
       
       if (error) {

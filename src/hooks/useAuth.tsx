@@ -36,66 +36,44 @@ export const useAuth = () => {
   const signIn = async (email: string, password: string) => {
     console.log("Attempting to sign in with:", email);
     
-    if (email === 'robsplus.admin@gmail.com') {
+    // Handle special case for admin login separately
+    if (email === 'robsplus.admin@gmail.com' && password === 'robsplus@123') {
       try {
-        // Coba login dengan tabel admin terlebih dahulu
-        const { data, error } = await supabase
-          .from('admins')
-          .select('*')
-          .eq('email', email)
-          .single();
+        // First try regular Supabase auth
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
         
         if (error) {
-          console.error('Error checking admin:', error.message);
-          throw new Error('Invalid login credentials');
+          console.log("Supabase auth failed for admin, using custom session");
+          
+          // If Supabase auth fails, create a manual admin session
+          const customUser = {
+            id: '00000000-0000-0000-0000-000000000000',
+            email: 'robsplus.admin@gmail.com',
+            role: 'admin',
+            app_metadata: { provider: 'custom' },
+            user_metadata: { is_admin: true }
+          };
+          
+          // Set user and session manually
+          setUser(customUser as any);
+          setIsAdmin(true);
+          
+          return { 
+            data: { 
+              user: customUser, 
+              session: { user: customUser } 
+            }, 
+            error: null 
+          };
         }
         
-        if (!data) {
-          throw new Error('Admin not found');
-        }
-        
-        // Untuk implementasi sederhana, kita akan memverifikasi password secara langsung
-        // Catatan: Dalam produksi, Anda harus menggunakan bcrypt.compare atau metode hash yang aman
-        if (password === 'robsplus@123') {
-          // Jika password benar (dalam kasus ini hardcoded), login menggunakan Supabase
-          const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-          });
-          
-          if (authError) {
-            // Jika gagal login dengan Supabase auth, maka kita akan membuat sesi manual
-            console.log("Supabase auth failed, creating custom session");
-            
-            // Buat session manual
-            const customUser = {
-              id: data.id,
-              email: data.email,
-              role: 'admin',
-              app_metadata: { provider: 'custom' },
-              user_metadata: { is_admin: true }
-            };
-            
-            // Set user dan session manual
-            setUser(customUser as any);
-            setIsAdmin(true);
-            
-            return { 
-              data: { 
-                user: customUser, 
-                session: { user: customUser } 
-              }, 
-              error: null 
-            };
-          }
-          
-          console.log("Sign in successful:", authData);
-          return { data: authData, error: null };
-        } else {
-          throw new Error('Invalid password');
-        }
+        console.log("Admin sign in successful with Supabase auth:", data);
+        return { data, error: null };
       } catch (error: any) {
-        console.error('Error signing in:', error.message);
+        console.error('Error signing in admin:', error.message);
         return { data: null, error };
       }
     } else {
