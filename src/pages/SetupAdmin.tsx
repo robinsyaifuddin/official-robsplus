@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -9,6 +8,13 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
 const TOKEN_KEY = "setup_admin_token";
+
+interface TokenSettings {
+  token: string;
+  used: boolean;
+  admin_id?: string;
+  created_at?: string;
+}
 
 const SetupAdmin = () => {
   const [searchParams] = useSearchParams();
@@ -26,14 +32,12 @@ const SetupAdmin = () => {
   
   useEffect(() => {
     const verifyToken = async () => {
-      // Check if token exists
       if (!token) {
         setTokenChecking(false);
         return;
       }
       
       try {
-        // Check if token has been used before
         const { data: settings, error: settingsError } = await supabase
           .from('settings')
           .select('*')
@@ -41,7 +45,6 @@ const SetupAdmin = () => {
           .single();
         
         if (settingsError) {
-          // If settings don't exist, create them and make token valid
           if (settingsError.code === 'PGRST116') {
             setTokenValid(true);
             setTokenChecking(false);
@@ -50,8 +53,9 @@ const SetupAdmin = () => {
           throw settingsError;
         }
         
-        // If settings exist, check if token is valid
-        if (settings && settings.value && settings.value.token === token && !settings.value.used) {
+        const settingsValue = settings.value as TokenSettings;
+        
+        if (settings && settingsValue && settingsValue.token === token && !settingsValue.used) {
           setTokenValid(true);
         } else {
           toast.error("Token tidak valid atau sudah digunakan");
@@ -88,7 +92,6 @@ const SetupAdmin = () => {
     setIsLoading(true);
     
     try {
-      // Create admin user in the admins table
       const { data: admin, error: adminError } = await supabase
         .from('admins')
         .insert([{ email, password }])
@@ -99,7 +102,6 @@ const SetupAdmin = () => {
         throw adminError;
       }
       
-      // Mark token as used
       const { error: tokenError } = await supabase
         .from('settings')
         .upsert([
@@ -113,7 +115,6 @@ const SetupAdmin = () => {
         throw tokenError;
       }
       
-      // Create auth user
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -133,7 +134,6 @@ const SetupAdmin = () => {
         description: "Silahkan login menggunakan email dan kata sandi yang telah dibuat"
       });
       
-      // Redirect to admin login
       navigate('/admin');
       
     } catch (error: any) {

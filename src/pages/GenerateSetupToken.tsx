@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,13 +10,19 @@ import { supabase } from '@/integrations/supabase/client';
 
 const TOKEN_KEY = "setup_admin_token";
 
+interface TokenSettings {
+  token: string;
+  used: boolean;
+  admin_id?: string;
+  created_at: string;
+}
+
 const GenerateSetupToken = () => {
   const { user, isAdmin } = useAuth();
   const [token, setToken] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   
-  // Redirect if not admin
   if (!user || !isAdmin()) {
     return <Navigate to="/admin" replace />;
   }
@@ -26,20 +31,24 @@ const GenerateSetupToken = () => {
     setIsLoading(true);
     
     try {
-      // Generate a random token
       const randomBytes = new Uint8Array(32);
       crypto.getRandomValues(randomBytes);
       const newToken = Array.from(randomBytes)
         .map(b => b.toString(16).padStart(2, "0"))
         .join("");
       
-      // Store token in settings table
+      const tokenSettings: TokenSettings = {
+        token: newToken,
+        used: false,
+        created_at: new Date().toISOString()
+      };
+      
       const { error } = await supabase
         .from('settings')
         .upsert([
           { 
             id: TOKEN_KEY, 
-            value: { token: newToken, used: false, created_at: new Date().toISOString() }
+            value: tokenSettings
           }
         ]);
       
@@ -68,7 +77,6 @@ const GenerateSetupToken = () => {
       setCopied(true);
       toast.success("URL berhasil disalin");
       
-      // Reset copy status after 2 seconds
       setTimeout(() => {
         setCopied(false);
       }, 2000);
