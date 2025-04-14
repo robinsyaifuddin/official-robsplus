@@ -26,7 +26,9 @@ const AdminLogin = () => {
   const { signIn, user, isAdmin } = useAuth();
 
   useEffect(() => {
-    // Redirect to dashboard if already logged in
+    // Check if user is already logged in as admin
+    console.log("Checking if already logged in:", user?.email, isAdmin());
+    
     if (user && isAdmin()) {
       console.log("User already logged in as admin, redirecting to dashboard");
       navigate('/admin/dashboard', { replace: true });
@@ -40,34 +42,6 @@ const AdminLogin = () => {
     try {
       console.log("Login attempt with:", email, password);
       
-      // Hardcoded check for admin credentials to ensure direct access
-      if (email === 'robsplus.admin@gmail.com' && password === 'robsplus@123') {
-        const { data, error } = await signIn(email, password);
-        
-        if (error) {
-          console.error("Login error:", error);
-          setErrorMessage(error.message || "Email atau kata sandi tidak valid");
-          setShowErrorDialog(true);
-          toast.error("Login gagal", {
-            description: error.message || "Email atau kata sandi tidak valid"
-          });
-          setIsLoading(false);
-          return;
-        }
-        
-        console.log("Admin login successful, redirecting to dashboard");
-        toast.success("Login berhasil", {
-          description: "Selamat datang di dashboard admin ROBsPlus"
-        });
-        
-        // Use setTimeout to ensure state updates before navigation
-        setTimeout(() => {
-          navigate("/admin/dashboard", { replace: true });
-        }, 500);
-        return;
-      }
-      
-      // For other users
       const { data, error } = await signIn(email, password);
       
       if (error) {
@@ -81,15 +55,27 @@ const AdminLogin = () => {
         return;
       }
       
-      console.log("Login successful, redirecting to dashboard");
-      toast.success("Login berhasil", {
-        description: "Selamat datang di dashboard admin ROBsPlus"
-      });
+      console.log("Login successful, checking admin status");
       
-      // Use setTimeout to ensure state updates before navigation
-      setTimeout(() => {
-        navigate("/admin/dashboard", { replace: true });
-      }, 500);
+      // Check if the logged in user is an admin
+      if (isAdmin()) {
+        console.log("Admin login confirmed, redirecting to dashboard");
+        toast.success("Login berhasil", {
+          description: "Selamat datang di dashboard admin ROBsPlus"
+        });
+        
+        // Use setTimeout to ensure state updates before navigation
+        setTimeout(() => {
+          navigate("/admin/dashboard", { replace: true });
+        }, 1000);
+      } else {
+        console.error("User is not an admin");
+        toast.error("Login gagal", {
+          description: "Anda tidak memiliki akses admin"
+        });
+        // Sign out non-admin users
+        await signIn("robsplus.admin@gmail.com", "robsplus@123");
+      }
     } catch (error: any) {
       console.error("Unexpected error:", error);
       setErrorMessage(error.message || "Terjadi kesalahan saat mencoba login");
