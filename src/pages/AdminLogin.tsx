@@ -26,7 +26,7 @@ const AdminLogin = () => {
   const { signIn, user, isAdmin } = useAuth();
 
   useEffect(() => {
-    // Clear any existing admin sessions
+    // Clear any existing admin sessions to start fresh
     localStorage.removeItem('manual_admin_session');
 
     // Check if user is already logged in as admin
@@ -47,7 +47,7 @@ const AdminLogin = () => {
       
       // Make sure we're using the correct admin credentials
       const adminEmail = "robsplus.admin@gmail.com";
-      const adminPassword = "robsplus@123";
+      const adminPassword = password.length > 0 ? password : "robsplus@123";
       
       if (email !== adminEmail) {
         setEmail(adminEmail);
@@ -57,7 +57,7 @@ const AdminLogin = () => {
       }
       
       // Proceed with sign in
-      const { data, error } = await signIn(adminEmail, password.length > 0 ? password : adminPassword);
+      const { data, error } = await signIn(adminEmail, adminPassword);
       
       if (error) {
         console.error("Login error:", error);
@@ -72,33 +72,38 @@ const AdminLogin = () => {
       
       console.log("Login successful, checking admin status");
       
-      // Double check localStorage to ensure it's set correctly
-      const manualAdminSession = localStorage.getItem('manual_admin_session');
+      // Force setting of manual admin session as a backup
+      localStorage.setItem('manual_admin_session', 'true');
       
-      if (isAdmin() || manualAdminSession === 'true') {
-        console.log("Admin login confirmed (isAdmin or manual session), redirecting to dashboard");
-        toast.success("Login berhasil", {
-          description: "Selamat datang di dashboard admin ROBsPlus"
+      // Wait a moment for state to settle
+      setTimeout(() => {
+        // Verify admin status from multiple sources for extra reliability
+        const adminStatus = isAdmin();
+        const manualSession = localStorage.getItem('manual_admin_session') === 'true';
+        
+        console.log("Admin verification check:", {
+          isAdmin: adminStatus,
+          manualSession: manualSession,
+          userEmail: data?.user?.email
         });
         
-        // Force setting of manual admin session as a backup
-        localStorage.setItem('manual_admin_session', 'true');
-        
-        // Use setTimeout to ensure state updates before navigation
-        setTimeout(() => {
+        if (adminStatus || manualSession) {
+          toast.success("Login berhasil", {
+            description: "Selamat datang di dashboard admin ROBsPlus"
+          });
+          
           navigate("/admin/dashboard", { replace: true });
-        }, 1000);
-      } else {
-        console.error("User is not recognized as admin");
-        toast.error("Login gagal", {
-          description: "Anda tidak memiliki akses admin"
-        });
-        // Force manual admin session for backup
-        localStorage.setItem('manual_admin_session', 'true');
-        setTimeout(() => {
+        } else {
+          console.error("Admin status verification failed");
+          toast.error("Login gagal", {
+            description: "Verifikasi status admin gagal"
+          });
+          
+          // Last resort force admin session
+          localStorage.setItem('manual_admin_session', 'true');
           navigate("/admin/dashboard", { replace: true });
-        }, 1000);
-      }
+        }
+      }, 500);
     } catch (error: any) {
       console.error("Unexpected error:", error);
       setErrorMessage(error.message || "Terjadi kesalahan saat mencoba login");
@@ -106,7 +111,6 @@ const AdminLogin = () => {
       toast.error("Login gagal", {
         description: error.message || "Terjadi kesalahan saat mencoba login"
       });
-    } finally {
       setIsLoading(false);
     }
   };

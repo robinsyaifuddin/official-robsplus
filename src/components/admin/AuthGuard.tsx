@@ -20,40 +20,51 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
     if (!loading) {
       console.log("Auth state loaded in AuthGuard:", { 
         user: user?.email, 
-        isAdmin: isAdmin()
+        isAdmin: isAdmin(),
+        manualSession: localStorage.getItem('manual_admin_session')
       });
       
       // Set a delay to ensure auth state is fully processed
       const timer = setTimeout(() => {
-        const adminStatus = isAdmin();
-        console.log("Admin status check result:", adminStatus);
-        
         // Force reload localStorage to ensure it's up to date
         const manualAdminSession = localStorage.getItem('manual_admin_session');
-        console.log("Manual admin session in AuthGuard:", manualAdminSession);
+        const adminStatus = isAdmin() || manualAdminSession === 'true';
         
-        if (!user && manualAdminSession !== 'true') {
-          console.log("No user found and no manual admin session, redirecting");
-          toast.error("Autentikasi diperlukan", {
-            description: "Silakan login sebagai admin untuk mengakses halaman ini"
-          });
-          navigate("/admin", { replace: true });
-        } else if (!adminStatus && manualAdminSession !== 'true') {
-          console.log("User is not admin and no manual admin session, redirecting");
-          toast.error("Akses ditolak", {
-            description: "Anda tidak memiliki hak akses admin"
-          });
+        console.log("Admin authentication check:", {
+          userExists: !!user,
+          isAdmin: isAdmin(),
+          manualAdminSession: manualAdminSession,
+          finalAdminStatus: adminStatus
+        });
+        
+        if (!adminStatus) {
+          console.log("Failed admin authentication, redirecting to login");
+          
+          // Only show toast if not coming from login page
+          if (location.pathname !== "/admin") {
+            toast.error("Autentikasi diperlukan", {
+              description: "Silakan login sebagai admin untuk mengakses halaman ini"
+            });
+          }
+          
+          // Force clear any potentially corrupted admin sessions
+          localStorage.removeItem('manual_admin_session');
+          
           navigate("/admin", { replace: true });
         } else {
-          console.log("User is authenticated as admin or has manual admin session");
+          console.log("Admin authentication successful");
+          // Re-validate manual admin session if needed
+          if (!user && manualAdminSession === 'true') {
+            console.log("Using manual admin session without user object");
+          }
         }
         
         setIsChecking(false);
-      }, 1500); // Increase timeout to ensure state is fully updated
+      }, 300); // Reduced timeout for faster response
       
       return () => clearTimeout(timer);
     }
-  }, [loading, user, isAdmin, navigate]);
+  }, [loading, user, isAdmin, navigate, location.pathname]);
 
   if (loading || isChecking) {
     return (
@@ -66,14 +77,16 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
     );
   }
 
-  // Final check - also check localStorage directly as a fallback
+  // Perform final authentication check
   const manualSession = localStorage.getItem('manual_admin_session');
-  if ((!user || !isAdmin()) && manualSession !== 'true') {
+  const isAuthenticated = isAdmin() || manualSession === 'true';
+  
+  if (!isAuthenticated) {
     console.log("Final check: Not authenticated as admin, redirecting to login page");
     return <Navigate to="/admin" state={{ from: location }} replace />;
   }
 
-  console.log("User is authenticated as admin, rendering children");
+  console.log("User is authenticated as admin, rendering admin content");
   return <>{children}</>;
 };
 
