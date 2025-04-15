@@ -2,9 +2,10 @@
 import { ReactNode, useEffect, useState } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Database } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
 
 interface AuthGuardProps {
   children: ReactNode;
@@ -15,24 +16,29 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isChecking, setIsChecking] = useState(true);
+  const [supabaseStatus, setSupabaseStatus] = useState<'checking' | 'connected' | 'error'>('checking');
 
   useEffect(() => {
     // Verifikasi koneksi Supabase
     const checkSupabaseConnection = async () => {
       try {
+        console.log("AuthGuard: Checking Supabase connection...");
         // Periksa koneksi ke Supabase dengan menjalankan query sederhana
         const { error } = await supabase.from('settings').select('id').limit(1);
         
         if (error) {
-          console.error("Supabase connection error:", error);
+          console.error("AuthGuard: Supabase connection error:", error);
+          setSupabaseStatus('error');
           toast.error("Koneksi Supabase gagal", {
             description: "Terjadi masalah saat terhubung ke database"
           });
         } else {
-          console.log("Supabase connection successful");
+          console.log("AuthGuard: Supabase connection successful");
+          setSupabaseStatus('connected');
         }
       } catch (e) {
-        console.error("Failed to connect to Supabase:", e);
+        console.error("AuthGuard: Failed to connect to Supabase:", e);
+        setSupabaseStatus('error');
       }
     };
     
@@ -40,7 +46,7 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
     
     // Wait for authentication to complete
     if (!loading) {
-      console.log("Auth state loaded in AuthGuard:", { 
+      console.log("AuthGuard: Auth state loaded:", { 
         user: user?.email, 
         isAdmin: isAdmin(),
         path: location.pathname,
@@ -53,7 +59,7 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
         const manualAdminSession = localStorage.getItem('manual_admin_session');
         const adminStatus = isAdmin() || manualAdminSession === 'true';
         
-        console.log("Admin authentication check:", {
+        console.log("AuthGuard: Admin authentication check:", {
           userExists: !!user,
           isAdmin: isAdmin(),
           manualAdminSession: manualAdminSession,
@@ -61,7 +67,7 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
         });
         
         if (!adminStatus) {
-          console.log("Failed admin authentication, redirecting to login");
+          console.log("AuthGuard: Failed admin authentication, redirecting to login");
           
           // Only show toast if not coming from login page
           if (location.pathname !== "/admin") {
@@ -75,10 +81,10 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
           
           navigate("/admin", { replace: true });
         } else {
-          console.log("Admin authentication successful, rendering content");
+          console.log("AuthGuard: Admin authentication successful, rendering content");
           // Re-validate manual admin session if needed
           if (!user && manualAdminSession === 'true') {
-            console.log("Using manual admin session without user object");
+            console.log("AuthGuard: Using manual admin session without user object");
             
             // Refresh session for better reliability
             localStorage.setItem('manual_admin_session', 'true');
@@ -103,16 +109,45 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
     );
   }
 
+  if (supabaseStatus === 'error') {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-dark">
+        <div className="flex flex-col items-center gap-4 max-w-md text-center p-6">
+          <Database className="h-12 w-12 text-red-500" />
+          <h2 className="text-xl font-bold text-white">Koneksi Database Bermasalah</h2>
+          <p className="text-gray-300 mb-4">
+            Tidak dapat terhubung ke Supabase. Pastikan koneksi internet Anda stabil dan coba refresh halaman.
+          </p>
+          <div className="flex gap-3">
+            <Button 
+              onClick={() => window.location.reload()} 
+              className="bg-cyberpunk hover:bg-cyberpunk-light"
+            >
+              Refresh Halaman
+            </Button>
+            <Button 
+              variant="outline" 
+              className="border-gray-700"
+              onClick={() => navigate("/admin", { replace: true })}
+            >
+              Kembali ke Login
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Perform final authentication check
   const manualSession = localStorage.getItem('manual_admin_session');
   const isAuthenticated = isAdmin() || manualSession === 'true';
   
   if (!isAuthenticated) {
-    console.log("Final check: Not authenticated as admin, redirecting to login page");
+    console.log("AuthGuard: Final check: Not authenticated as admin, redirecting to login page");
     return <Navigate to="/admin" state={{ from: location }} replace />;
   }
 
-  console.log("User is authenticated as admin, rendering admin content", {path: location.pathname});
+  console.log("AuthGuard: User is authenticated as admin, rendering admin content", {path: location.pathname});
   return <>{children}</>;
 };
 
