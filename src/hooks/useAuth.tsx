@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User, Session } from '@supabase/supabase-js';
 import { toast } from 'sonner';
@@ -91,6 +91,10 @@ export const useAuth = () => {
     initializeAuth();
     return () => subscription.unsubscribe();
   }, []);
+
+  const isAdmin = useCallback(() => {
+    return isAdminState;
+  }, [isAdminState]);
 
   const signIn = async (email: string, password: string) => {
     console.log("Attempting to sign in with:", email);
@@ -216,6 +220,6 @@ export const useAuth = () => {
     loading,
     signIn,
     signOut,
-    isAdmin: () => isAdminState,
+    isAdmin,
   };
 };

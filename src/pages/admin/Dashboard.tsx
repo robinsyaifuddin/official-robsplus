@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { 
@@ -15,8 +15,15 @@ import {
   Tooltip, 
   ResponsiveContainer 
 } from 'recharts';
+import { useAuth } from '@/hooks/useAuth';
 
 const Dashboard = () => {
+  const { user } = useAuth();
+  
+  useEffect(() => {
+    console.log("Dashboard rendered", { user: user?.email });
+  }, [user]);
+
   // Mock data for visitors chart
   const visitorsData = [
     { month: 'Jan', visitors: 450 },

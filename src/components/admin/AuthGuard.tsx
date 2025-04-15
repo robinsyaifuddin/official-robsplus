@@ -21,6 +21,7 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
       console.log("Auth state loaded in AuthGuard:", { 
         user: user?.email, 
         isAdmin: isAdmin(),
+        path: location.pathname,
         manualSession: localStorage.getItem('manual_admin_session')
       });
       
@@ -52,7 +53,7 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
           
           navigate("/admin", { replace: true });
         } else {
-          console.log("Admin authentication successful");
+          console.log("Admin authentication successful, rendering content");
           // Re-validate manual admin session if needed
           if (!user && manualAdminSession === 'true') {
             console.log("Using manual admin session without user object");
@@ -60,7 +61,7 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
         }
         
         setIsChecking(false);
-      }, 300); // Reduced timeout for faster response
+      }, 200); // Reduced timeout for faster response
       
       return () => clearTimeout(timer);
     }
@@ -86,7 +87,7 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
     return <Navigate to="/admin" state={{ from: location }} replace />;
   }
 
-  console.log("User is authenticated as admin, rendering admin content");
+  console.log("User is authenticated as admin, rendering admin content", {path: location.pathname});
   return <>{children}</>;
 };
 

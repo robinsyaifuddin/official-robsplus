@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import ServicesPage from "./pages/ServicesPage";
 import PortfolioPage from "./pages/PortfolioPage";
@@ -25,7 +25,14 @@ import AuthGuard from "./components/admin/AuthGuard";
 import SetupAdmin from "./pages/SetupAdmin";
 import GenerateSetupToken from "./pages/GenerateSetupToken";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -60,6 +67,9 @@ const App = () => (
             <Route path="integration" element={<IntegrationAdmin />} />
             <Route path="generate-token" element={<GenerateSetupToken />} />
           </Route>
+          
+          {/* Redirect /admin/* to Dashboard */}
+          <Route path="/admin/*" element={<Navigate to="/admin/dashboard" replace />} />
           
           {/* Not Found */}
           <Route path="*" element={<NotFound />} />
