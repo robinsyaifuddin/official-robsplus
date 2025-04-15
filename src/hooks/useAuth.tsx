@@ -11,24 +11,64 @@ export const useAuth = () => {
   const [isAdminState, setIsAdminState] = useState(false);
 
   useEffect(() => {
-    console.log("Initializing auth state...");
+    console.log("useAuth: Initializing auth state...");
+    
+    // Check for manually set admin session in localStorage before setting up listeners
+    const manualAdminSession = localStorage.getItem('manual_admin_session');
+    if (manualAdminSession === 'true') {
+      console.log("useAuth: Found manual admin session during init");
+      setIsAdminState(true);
+      
+      if (!user) {
+        // Create a custom admin user when using manual session
+        const createManualAdminUser = () => {
+          const customUser = {
+            id: '00000000-0000-0000-0000-000000000000',
+            email: 'robsplus.admin@gmail.com',
+            app_metadata: { provider: 'custom' },
+            user_metadata: { is_admin: true },
+            // Add required properties from User type
+            aud: 'authenticated',
+            created_at: new Date().toISOString(),
+            role: '',
+            updated_at: new Date().toISOString(),
+            confirmation_sent_at: null,
+            confirmed_at: new Date().toISOString(),
+            last_sign_in_at: new Date().toISOString(),
+            factors: null,
+            identities: [],
+            phone: '',
+            recovery_sent_at: null,
+          } as User;
+          
+          setUser(customUser);
+        };
+        
+        createManualAdminUser();
+      }
+    }
     
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, currentSession) => {
-        console.log("Auth state changed:", event);
+      (event, currentSession) => {
+        console.log("useAuth: Auth state changed:", event);
+        
+        // Update session and user from currentSession
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
         
-        // Check if user is admin
+        // Admin check: email-based
         const isAdminUser = currentSession?.user?.email === 'robsplus.admin@gmail.com';
-        console.log("Is admin check:", isAdminUser);
-        setIsAdminState(isAdminUser);
+        console.log("useAuth: Is admin check from email:", isAdminUser);
         
-        // Check for manually set admin session in localStorage
-        const manualAdminSession = localStorage.getItem('manual_admin_session');
-        if (manualAdminSession === 'true') {
-          console.log("Manual admin session found in localStorage during auth change");
+        if (isAdminUser) {
+          setIsAdminState(true);
+        }
+        
+        // Also check for manually set admin status
+        const manualAdmin = localStorage.getItem('manual_admin_session') === 'true';
+        if (manualAdmin) {
+          console.log("useAuth: Manual admin session found during auth change");
           setIsAdminState(true);
         }
         
@@ -40,50 +80,51 @@ export const useAuth = () => {
     const initializeAuth = async () => {
       try {
         const { data: { session: currentSession } } = await supabase.auth.getSession();
-        console.log("Initial session check:", currentSession?.user?.email);
+        console.log("useAuth: Initial session check:", currentSession?.user?.email);
+        
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
         
-        // Check if user is admin
+        // Admin check: email-based
         const isAdminUser = currentSession?.user?.email === 'robsplus.admin@gmail.com';
-        console.log("Is admin check:", isAdminUser);
-        setIsAdminState(isAdminUser);
+        console.log("useAuth: Is admin check from email:", isAdminUser);
         
-        // Check for manually set admin session in localStorage
-        const manualAdminSession = localStorage.getItem('manual_admin_session');
-        if (manualAdminSession === 'true') {
-          console.log("Manual admin session found in localStorage during initialization");
+        if (isAdminUser) {
           setIsAdminState(true);
+        }
+        
+        // Also check for manually set admin status again
+        const manualAdmin = localStorage.getItem('manual_admin_session') === 'true';
+        if (manualAdmin && !currentSession?.user) {
+          console.log("useAuth: Manual admin session found but no session, creating custom user");
           
-          if (!currentSession?.user) {
-            // Create a custom user object with required User properties
-            const customUser = {
-              id: '00000000-0000-0000-0000-000000000000',
-              email: 'robsplus.admin@gmail.com',
-              app_metadata: { provider: 'custom' },
-              user_metadata: { is_admin: true },
-              // Add required properties from User type
-              aud: 'authenticated',
-              created_at: new Date().toISOString(),
-              // Additional required properties with default values
-              role: '',
-              updated_at: new Date().toISOString(),
-              confirmation_sent_at: null,
-              confirmed_at: new Date().toISOString(),
-              last_sign_in_at: new Date().toISOString(),
-              factors: null,
-              identities: [],
-              phone: '',
-              recovery_sent_at: null,
-            } as User;
-            
-            setUser(customUser);
-          }
+          // Create a custom user object with required User properties
+          const customUser = {
+            id: '00000000-0000-0000-0000-000000000000',
+            email: 'robsplus.admin@gmail.com',
+            app_metadata: { provider: 'custom' },
+            user_metadata: { is_admin: true },
+            // Add required properties from User type
+            aud: 'authenticated',
+            created_at: new Date().toISOString(),
+            role: '',
+            updated_at: new Date().toISOString(),
+            confirmation_sent_at: null,
+            confirmed_at: new Date().toISOString(),
+            last_sign_in_at: new Date().toISOString(),
+            factors: null,
+            identities: [],
+            phone: '',
+            recovery_sent_at: null,
+          } as User;
+          
+          setUser(customUser);
+          setIsAdminState(true);
         }
         
         setLoading(false);
       } catch (error) {
-        console.error("Error initializing auth:", error);
+        console.error("useAuth: Error initializing auth:", error);
         setLoading(false);
       }
     };
@@ -93,16 +134,16 @@ export const useAuth = () => {
   }, []);
 
   const isAdmin = useCallback(() => {
-    return isAdminState;
+    return isAdminState || localStorage.getItem('manual_admin_session') === 'true';
   }, [isAdminState]);
 
   const signIn = async (email: string, password: string) => {
-    console.log("Attempting to sign in with:", email);
+    console.log("useAuth: Attempting to sign in with:", email);
     
     // Handle special case for admin login
     if (email === 'robsplus.admin@gmail.com' && password === 'robsplus@123') {
       try {
-        console.log("Admin login credentials match, attempting Supabase auth");
+        console.log("useAuth: Admin login credentials match, attempting Supabase auth");
         
         // First try regular Supabase auth
         const { data, error } = await supabase.auth.signInWithPassword({
@@ -111,7 +152,7 @@ export const useAuth = () => {
         });
         
         if (error) {
-          console.log("Supabase auth failed for admin, using manual session", error);
+          console.log("useAuth: Supabase auth failed for admin, using manual session", error);
           
           // Set manual admin session in localStorage
           localStorage.setItem('manual_admin_session', 'true');
@@ -125,7 +166,6 @@ export const useAuth = () => {
             // Add required properties from User type
             aud: 'authenticated',
             created_at: new Date().toISOString(),
-            // Additional required properties with default values
             role: '',
             updated_at: new Date().toISOString(),
             confirmation_sent_at: null,
@@ -161,11 +201,11 @@ export const useAuth = () => {
           };
         }
         
-        console.log("Admin sign in successful with Supabase auth:", data);
+        console.log("useAuth: Admin sign in successful with Supabase auth:", data);
         setIsAdminState(true);
         return { data, error: null };
       } catch (error: any) {
-        console.error('Error signing in admin:', error.message);
+        console.error('useAuth: Error signing in admin:', error.message);
         return { data: null, error };
       }
     } else {
@@ -177,7 +217,7 @@ export const useAuth = () => {
         });
         
         if (error) throw error;
-        console.log("Sign in successful:", data);
+        console.log("useAuth: Sign in successful:", data);
         
         // Check if user is admin
         const isAdminUser = data.user?.email === 'robsplus.admin@gmail.com';
@@ -185,7 +225,7 @@ export const useAuth = () => {
         
         return { data, error: null };
       } catch (error: any) {
-        console.error('Error signing in:', error.message);
+        console.error('useAuth: Error signing in:', error.message);
         return { data: null, error };
       }
     }
@@ -207,9 +247,10 @@ export const useAuth = () => {
       setIsAdminState(false);
       setSession(null);
       
+      console.log("useAuth: User signed out successfully");
       return { error: null };
     } catch (error: any) {
-      console.error('Error signing out:', error.message);
+      console.error('useAuth: Error signing out:', error.message);
       return { error };
     }
   };

@@ -2,7 +2,7 @@
 import { ReactNode, useEffect, useState } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { Loader2, Database } from 'lucide-react';
+import { Loader2, Database, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -19,18 +19,25 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
   const [supabaseStatus, setSupabaseStatus] = useState<'checking' | 'connected' | 'error'>('checking');
 
   useEffect(() => {
-    // Verifikasi koneksi Supabase
+    console.log("AuthGuard: Initial render", { 
+      pathname: location.pathname,
+      loading, 
+      user: user?.email, 
+      isAdminFunc: isAdmin()
+    });
+    
+    // Verify Supabase connection
     const checkSupabaseConnection = async () => {
       try {
         console.log("AuthGuard: Checking Supabase connection...");
-        // Periksa koneksi ke Supabase dengan menjalankan query sederhana
+        // Use a simple query to check connection
         const { error } = await supabase.from('settings').select('id').limit(1);
         
         if (error) {
           console.error("AuthGuard: Supabase connection error:", error);
           setSupabaseStatus('error');
           toast.error("Koneksi Supabase gagal", {
-            description: "Terjadi masalah saat terhubung ke database"
+            description: "Terjadi masalah saat terhubung ke database. Coba refresh halaman."
           });
         } else {
           console.log("AuthGuard: Supabase connection successful");
@@ -42,20 +49,19 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
       }
     };
     
+    // Run the connection check immediately
     checkSupabaseConnection();
     
-    // Wait for authentication to complete
+    // Auth check logic
     if (!loading) {
-      console.log("AuthGuard: Auth state loaded:", { 
+      console.log("AuthGuard: Auth check starting", { 
         user: user?.email, 
         isAdmin: isAdmin(),
-        path: location.pathname,
         manualSession: localStorage.getItem('manual_admin_session')
       });
       
-      // Set a delay to ensure auth state is fully processed
-      const timer = setTimeout(() => {
-        // Force reload localStorage to ensure it's up to date
+      // Ensure we have the latest admin status
+      const checkAdminAccess = () => {
         const manualAdminSession = localStorage.getItem('manual_admin_session');
         const adminStatus = isAdmin() || manualAdminSession === 'true';
         
@@ -67,37 +73,46 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
         });
         
         if (!adminStatus) {
-          console.log("AuthGuard: Failed admin authentication, redirecting to login");
+          console.log("AuthGuard: User is not an admin, redirecting to login");
           
-          // Only show toast if not coming from login page
+          // Only show toast if not already on login page
           if (location.pathname !== "/admin") {
             toast.error("Autentikasi diperlukan", {
               description: "Silakan login sebagai admin untuk mengakses halaman ini"
             });
           }
           
-          // Force clear any potentially corrupted admin sessions
+          // Clear any potentially corrupted admin sessions
           localStorage.removeItem('manual_admin_session');
           
           navigate("/admin", { replace: true });
-        } else {
-          console.log("AuthGuard: Admin authentication successful, rendering content");
-          // Re-validate manual admin session if needed
-          if (!user && manualAdminSession === 'true') {
-            console.log("AuthGuard: Using manual admin session without user object");
-            
-            // Refresh session for better reliability
-            localStorage.setItem('manual_admin_session', 'true');
-          }
+          return false;
         }
         
+        // Re-validate manual admin session if needed
+        if (!user && manualAdminSession === 'true') {
+          console.log("AuthGuard: Using manual admin session without user object");
+          // Refresh session
+          localStorage.setItem('manual_admin_session', 'true');
+        }
+        
+        return true;
+      };
+      
+      // Delay slightly to ensure auth state is fully processed
+      const timer = setTimeout(() => {
+        const isAuthorized = checkAdminAccess();
+        if (isAuthorized) {
+          console.log("AuthGuard: User is authorized, rendering admin content");
+        }
         setIsChecking(false);
-      }, 200); // Reduced timeout for faster response
+      }, 300);
       
       return () => clearTimeout(timer);
     }
   }, [loading, user, isAdmin, navigate, location.pathname]);
 
+  // Show loading state while checking
   if (loading || isChecking) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-dark">
@@ -109,6 +124,7 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
     );
   }
 
+  // Show database connection error
   if (supabaseStatus === 'error') {
     return (
       <div className="flex min-h-screen items-center justify-center bg-dark">
@@ -121,8 +137,9 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
           <div className="flex gap-3">
             <Button 
               onClick={() => window.location.reload()} 
-              className="bg-cyberpunk hover:bg-cyberpunk-light"
+              className="bg-cyberpunk hover:bg-cyberpunk-light flex items-center gap-2"
             >
+              <RefreshCw className="h-4 w-4" />
               Refresh Halaman
             </Button>
             <Button 
@@ -138,7 +155,7 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
     );
   }
 
-  // Perform final authentication check
+  // Final auth check before rendering
   const manualSession = localStorage.getItem('manual_admin_session');
   const isAuthenticated = isAdmin() || manualSession === 'true';
   
@@ -147,7 +164,7 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
     return <Navigate to="/admin" state={{ from: location }} replace />;
   }
 
-  console.log("AuthGuard: User is authenticated as admin, rendering admin content", {path: location.pathname});
+  console.log("AuthGuard: User is authenticated as admin, rendering admin content");
   return <>{children}</>;
 };
 

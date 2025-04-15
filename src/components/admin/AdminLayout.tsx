@@ -2,12 +2,12 @@
 import React, { useEffect, useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Sidebar } from "@/components/ui/sidebar";
 import AdminHeader from './AdminHeader';
 import { useAuth } from '@/hooks/useAuth';
-import { Loader2, Database } from 'lucide-react';
+import { Loader2, Database, LayoutDashboard, FileText, ShoppingBag, Image, Users, Settings, Link, Key } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
 
 const AdminLayout = () => {
   const location = useLocation();
@@ -18,45 +18,48 @@ const AdminLayout = () => {
   
   // Verify Supabase connection
   useEffect(() => {
+    console.log("AdminLayout: Initial render", { 
+      path: location.pathname,
+      user: user?.email,
+      adminStatus: isAdmin(), 
+      manualSession: localStorage.getItem('manual_admin_session')
+    });
+    
     const checkSupabaseConnection = async () => {
       try {
-        console.log("Checking Supabase connection...");
-        const { error, data } = await supabase.from('settings').select('id').limit(1);
+        console.log("AdminLayout: Checking Supabase connection...");
+        const { error } = await supabase.from('settings').select('id').limit(1);
         
         if (error) {
-          console.error("Supabase connection error:", error);
+          console.error("AdminLayout: Supabase connection error:", error);
           setSupabaseStatus('error');
           toast.error("Koneksi Supabase gagal", {
             description: "Terjadi masalah saat terhubung ke database. Coba refresh halaman."
           });
         } else {
-          console.log("Supabase connection successful:", data);
+          console.log("AdminLayout: Supabase connection successful");
           setSupabaseStatus('connected');
         }
       } catch (e) {
-        console.error("Failed to connect to Supabase:", e);
+        console.error("AdminLayout: Failed to connect to Supabase:", e);
         setSupabaseStatus('error');
+      } finally {
+        // Continue with rendering even if there's a connection error
+        // The error state will be displayed in the UI
+        setTimeout(() => {
+          setIsReady(true);
+        }, 300);
       }
     };
     
     checkSupabaseConnection();
-  }, []);
-  
-  useEffect(() => {
-    console.log("AdminLayout rendered", { 
-      path: location.pathname,
-      user: user?.email,
-      isAdmin: isAdmin(),
-      loading,
-      supabaseStatus
-    });
     
-    // Check if user is admin after auth is loaded
+    // Check if user is admin
     if (!loading) {
       const adminStatus = isAdmin();
       const manualSession = localStorage.getItem('manual_admin_session') === 'true';
       
-      console.log("Admin verification in layout:", {
+      console.log("AdminLayout: Admin verification:", {
         adminStatus,
         manualSession,
         userEmail: user?.email
@@ -67,13 +70,9 @@ const AdminLayout = () => {
           description: "Silakan login sebagai admin untuk mengakses halaman ini"
         });
         navigate("/admin", { replace: true });
-        return;
       }
-      
-      // Mark as ready to render content
-      setIsReady(true);
     }
-  }, [location, loading, user, isAdmin, navigate, supabaseStatus]);
+  }, [location, loading, user, isAdmin, navigate]);
 
   if (loading || !isReady) {
     return (
@@ -89,16 +88,16 @@ const AdminLayout = () => {
   if (supabaseStatus === 'error') {
     return (
       <div className="flex min-h-screen items-center justify-center bg-dark">
-        <div className="flex flex-col items-center gap-4 max-w-md text-center">
+        <div className="flex flex-col items-center gap-4 max-w-md text-center p-6">
           <Database className="h-12 w-12 text-red-500" />
           <h2 className="text-xl font-bold text-white">Koneksi Database Bermasalah</h2>
-          <p className="text-gray-300">Tidak dapat terhubung ke Supabase. Pastikan koneksi internet Anda stabil dan coba refresh halaman.</p>
-          <button 
+          <p className="text-gray-300 mb-4">Tidak dapat terhubung ke Supabase. Pastikan koneksi internet Anda stabil dan coba refresh halaman.</p>
+          <Button 
             onClick={() => window.location.reload()} 
             className="mt-2 px-4 py-2 bg-cyberpunk text-white rounded hover:bg-cyberpunk-light"
           >
             Refresh Halaman
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -130,42 +129,42 @@ const AdminSidebar = () => {
   
   const sidebarItems = [
     { 
-      icon: 'LayoutDashboard', 
+      icon: LayoutDashboard, 
       label: 'Dashboard', 
       path: '/admin/dashboard' 
     },
     { 
-      icon: 'FileText', 
+      icon: FileText, 
       label: 'Halaman', 
       path: '/admin/pages' 
     },
     { 
-      icon: 'ShoppingBag', 
+      icon: ShoppingBag, 
       label: 'Produk', 
       path: '/admin/products' 
     },
     { 
-      icon: 'Image', 
+      icon: Image, 
       label: 'Portofolio', 
       path: '/admin/portfolio' 
     },
     { 
-      icon: 'Users', 
+      icon: Users, 
       label: 'Pengguna', 
       path: '/admin/users' 
     },
     { 
-      icon: 'Settings', 
+      icon: Settings, 
       label: 'Pengaturan', 
       path: '/admin/website' 
     },
     { 
-      icon: 'Link', 
+      icon: Link, 
       label: 'Integrasi', 
       path: '/admin/integration' 
     },
     { 
-      icon: 'Key', 
+      icon: Key, 
       label: 'Token Setup', 
       path: '/admin/generate-token' 
     }
@@ -190,7 +189,7 @@ const AdminSidebar = () => {
             }`}
           >
             <span className={`${isActive(item.path) ? 'text-white' : 'text-gray-400'}`}>
-              {renderIcon(item.icon)}
+              <item.icon className="h-5 w-5" />
             </span>
             <span>{item.label}</span>
           </button>
@@ -198,13 +197,6 @@ const AdminSidebar = () => {
       </div>
     </div>
   );
-};
-
-// Helper function to render icons dynamically
-const renderIcon = (iconName: string) => {
-  const Lucide = require('lucide-react');
-  const IconComponent = Lucide[iconName];
-  return IconComponent ? <IconComponent className="h-5 w-5" /> : null;
 };
 
 export default AdminLayout;

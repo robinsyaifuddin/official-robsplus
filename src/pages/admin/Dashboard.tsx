@@ -7,19 +7,17 @@ import {
   ArrowDownRight, Eye, Clock, Calendar, Loader2, Database, RefreshCw
 } from 'lucide-react';
 import { 
-  BarChart as RechartsBarChart, 
-  Bar, 
+  LineChart,
+  Line, 
   XAxis, 
   YAxis, 
   CartesianGrid, 
   Tooltip, 
   ResponsiveContainer,
-  LineChart,
-  Line,
-  Legend,
   PieChart,
   Pie,
-  Cell
+  Cell,
+  Legend
 } from 'recharts';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -43,11 +41,11 @@ const Dashboard = () => {
       setIsLoading(true);
       
       // Check Supabase connection
-      console.log("Verifying Supabase connection from Dashboard");
+      console.log("Dashboard: Verifying Supabase connection");
       const { error: connectionError } = await supabase.from('settings').select('id').limit(1);
       
       if (connectionError) {
-        console.error("Supabase connection error in Dashboard:", connectionError);
+        console.error("Dashboard: Supabase connection error:", connectionError);
         setDatabaseStatus('error');
         toast.error("Koneksi database gagal", {
           description: "Gagal memuat data dashboard dari Supabase"
@@ -56,6 +54,7 @@ const Dashboard = () => {
         return;
       }
       
+      console.log("Dashboard: Supabase connection successful");
       setDatabaseStatus('connected');
       
       // Fetch actual product count
@@ -71,25 +70,25 @@ const Dashboard = () => {
         .limit(1000);
       
       if (productsError) {
-        console.error("Error fetching products:", productsError);
+        console.error("Dashboard: Error fetching products:", productsError);
       }
       
       if (portfolioError) {
-        console.error("Error fetching portfolio items:", portfolioError);
+        console.error("Dashboard: Error fetching portfolio items:", portfolioError);
       }
       
       // Use real counts or default to simulated data
       const dashboardData = {
-        visitors: 24895, // Simulated since we don't track visitors yet
+        visitors: 24895, // Simulated
         products: productsData ? productsData.length : 45,
         portfolios: portfolioData ? portfolioData.length : 32,
-        users: 5 // Simulated since we don't have a users table yet
+        users: 5 // Simulated
       };
       
       setStats(dashboardData);
-      console.log("Dashboard data loaded successfully:", dashboardData);
+      console.log("Dashboard: Data loaded successfully:", dashboardData);
     } catch (error) {
-      console.error("Error fetching dashboard data:", error);
+      console.error("Dashboard: Error fetching dashboard data:", error);
       setDatabaseStatus('error');
       toast.error("Gagal memuat data", {
         description: "Terjadi kesalahan saat mengambil data dashboard"
@@ -100,8 +99,16 @@ const Dashboard = () => {
   };
   
   useEffect(() => {
-    console.log("Dashboard rendered", { user: user?.email });
+    console.log("Dashboard: Component mounted", { user: user?.email });
     fetchDashboardData();
+    
+    // Set up interval to refresh data every 5 minutes
+    const refreshInterval = setInterval(() => {
+      console.log("Dashboard: Auto-refreshing data");
+      fetchDashboardData();
+    }, 5 * 60 * 1000);
+    
+    return () => clearInterval(refreshInterval);
   }, [user]);
 
   // Data for visitors chart - adjusted based on tab selection
