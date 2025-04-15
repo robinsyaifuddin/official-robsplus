@@ -4,6 +4,7 @@ import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 interface AuthGuardProps {
   children: ReactNode;
@@ -16,6 +17,27 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
   const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
+    // Verifikasi koneksi Supabase
+    const checkSupabaseConnection = async () => {
+      try {
+        // Periksa koneksi ke Supabase dengan menjalankan query sederhana
+        const { error } = await supabase.from('settings').select('id').limit(1);
+        
+        if (error) {
+          console.error("Supabase connection error:", error);
+          toast.error("Koneksi Supabase gagal", {
+            description: "Terjadi masalah saat terhubung ke database"
+          });
+        } else {
+          console.log("Supabase connection successful");
+        }
+      } catch (e) {
+        console.error("Failed to connect to Supabase:", e);
+      }
+    };
+    
+    checkSupabaseConnection();
+    
     // Wait for authentication to complete
     if (!loading) {
       console.log("Auth state loaded in AuthGuard:", { 
@@ -57,6 +79,9 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
           // Re-validate manual admin session if needed
           if (!user && manualAdminSession === 'true') {
             console.log("Using manual admin session without user object");
+            
+            // Refresh session for better reliability
+            localStorage.setItem('manual_admin_session', 'true');
           }
         }
         
@@ -72,7 +97,7 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
       <div className="flex min-h-screen items-center justify-center bg-dark">
         <div className="flex flex-col items-center gap-2">
           <Loader2 className="h-8 w-8 animate-spin text-cyberpunk" />
-          <p className="text-white">Memeriksa autentikasi...</p>
+          <p className="text-white">Memeriksa autentikasi dan koneksi Supabase...</p>
         </div>
       </div>
     );

@@ -1,10 +1,10 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { 
   BarChart, Users, ShoppingCart, Image, TrendingUp, ArrowUpRight, 
-  ArrowDownRight, Eye, Clock, Calendar
+  ArrowDownRight, Eye, Clock, Calendar, Loader2
 } from 'lucide-react';
 import { 
   BarChart as RechartsBarChart, 
@@ -16,12 +16,59 @@ import {
   ResponsiveContainer 
 } from 'recharts';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const [isLoading, setIsLoading] = useState(true);
+  const [stats, setStats] = useState({
+    visitors: 0,
+    products: 0,
+    portfolios: 0,
+    users: 0
+  });
   
   useEffect(() => {
     console.log("Dashboard rendered", { user: user?.email });
+    
+    const fetchDashboardData = async () => {
+      try {
+        setIsLoading(true);
+        
+        // Periksa koneksi Supabase
+        console.log("Verifying Supabase connection from Dashboard");
+        const { error: connectionError } = await supabase.from('settings').select('id').limit(1);
+        
+        if (connectionError) {
+          console.error("Supabase connection error in Dashboard:", connectionError);
+          toast.error("Koneksi database gagal", {
+            description: "Gagal memuat data dashboard dari Supabase"
+          });
+          return;
+        }
+        
+        // Simulasikan pengambilan data statistik (dalam implementasi sebenarnya, ini akan mengambil data dari Supabase)
+        const mockData = {
+          visitors: 24895,
+          products: 45,
+          portfolios: 32,
+          users: 5
+        };
+        
+        setStats(mockData);
+        console.log("Dashboard data loaded successfully");
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+        toast.error("Gagal memuat data", {
+          description: "Terjadi kesalahan saat mengambil data dashboard"
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchDashboardData();
   }, [user]);
 
   // Mock data for visitors chart
@@ -41,6 +88,17 @@ const Dashboard = () => {
     { id: 3, activity: 'Portofolio Diperbarui', time: '3 hari yang lalu', user: 'Administrator' },
     { id: 4, activity: 'Pengaturan Website Diubah', time: '1 minggu yang lalu', user: 'Administrator' },
   ];
+
+  if (isLoading) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <div className="flex flex-col items-center gap-2">
+          <Loader2 className="h-8 w-8 animate-spin text-cyberpunk" />
+          <p>Memuat data dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -68,7 +126,7 @@ const Dashboard = () => {
             <Eye className="h-4 w-4 text-gray-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">24,895</div>
+            <div className="text-2xl font-bold">{stats.visitors.toLocaleString()}</div>
             <div className="mt-1 flex items-center text-xs">
               <ArrowUpRight className="mr-1 h-4 w-4 text-green-500" />
               <span className="text-green-500">12%</span>
@@ -82,7 +140,7 @@ const Dashboard = () => {
             <ShoppingCart className="h-4 w-4 text-gray-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">45</div>
+            <div className="text-2xl font-bold">{stats.products}</div>
             <div className="mt-1 flex items-center text-xs">
               <ArrowUpRight className="mr-1 h-4 w-4 text-green-500" />
               <span className="text-green-500">5%</span>
@@ -96,7 +154,7 @@ const Dashboard = () => {
             <Image className="h-4 w-4 text-gray-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">32</div>
+            <div className="text-2xl font-bold">{stats.portfolios}</div>
             <div className="mt-1 flex items-center text-xs">
               <ArrowUpRight className="mr-1 h-4 w-4 text-green-500" />
               <span className="text-green-500">8%</span>
@@ -110,7 +168,7 @@ const Dashboard = () => {
             <Users className="h-4 w-4 text-gray-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">5</div>
+            <div className="text-2xl font-bold">{stats.users}</div>
             <div className="mt-1 flex items-center text-xs">
               <ArrowDownRight className="mr-1 h-4 w-4 text-red-500" />
               <span className="text-red-500">0%</span>
