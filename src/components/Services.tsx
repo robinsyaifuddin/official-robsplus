@@ -1,5 +1,4 @@
-
-import { Book, FileText, PenTool, Presentation, FileCheck, HelpCircle, Globe, Image, Video, Users, XCircle, GraduationCap, Layout, Database } from "lucide-react";
+import { Book, FileText, PenTool, Presentation, FileCheck, HelpCircle, Globe, Image, Video, Users, XCircle, GraduationCap, Layout, Database, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const services = [
