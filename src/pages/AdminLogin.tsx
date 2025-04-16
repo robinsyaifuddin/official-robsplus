@@ -82,9 +82,10 @@ const AdminLogin = () => {
         const manualSession = localStorage.getItem('manual_admin_session') === 'true';
         
         console.log("Admin verification check:", {
-          isAdmin: adminStatus,
+          userExists: !!user,
+          isAdmin: isAdmin(),
           manualSession: manualSession,
-          userEmail: data?.user?.email
+          finalAdminStatus: adminStatus
         });
         
         if (adminStatus || manualSession) {
@@ -169,9 +170,6 @@ const AdminLogin = () => {
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
-              <p className="text-xs text-gray-400 mt-1">
-                *Gunakan password default jika tidak tahu: "robsplus@123"
-              </p>
             </div>
             <Button 
               type="submit" 

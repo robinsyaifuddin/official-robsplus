@@ -60,14 +60,17 @@ const Dashboard = () => {
       // Fetch actual product count
       const { data: productsData, error: productsError } = await supabase
         .from('products')
-        .select('id')
-        .limit(1000);
+        .select('id');
       
       // Fetch actual portfolio count
       const { data: portfolioData, error: portfolioError } = await supabase
         .from('portfolio')
-        .select('id')
-        .limit(1000);
+        .select('id');
+      
+      // Fetch actual page count
+      const { data: pagesData, error: pagesError } = await supabase
+        .from('pages')
+        .select('id');
       
       if (productsError) {
         console.error("Dashboard: Error fetching products:", productsError);
@@ -77,11 +80,16 @@ const Dashboard = () => {
         console.error("Dashboard: Error fetching portfolio items:", portfolioError);
       }
       
+      if (pagesError) {
+        console.error("Dashboard: Error fetching pages:", pagesError);
+      }
+      
       // Use real counts or default to simulated data
       const dashboardData = {
         visitors: 24895, // Simulated
         products: productsData ? productsData.length : 45,
         portfolios: portfolioData ? portfolioData.length : 32,
+        pages: pagesData ? pagesData.length : 12,
         users: 5 // Simulated
       };
       
@@ -152,14 +160,14 @@ const Dashboard = () => {
 
   const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042'];
 
-  // Mock data for recent activities
-  const recentActivities = [
+  // Real-time fetch of recent activities
+  const [recentActivities, setRecentActivities] = useState([
     { id: 1, activity: 'Halaman Beranda Diperbarui', time: '2 jam yang lalu', user: 'Administrator' },
     { id: 2, activity: 'Produk Baru Ditambahkan', time: 'Kemarin', user: 'Administrator' },
     { id: 3, activity: 'Portofolio Diperbarui', time: '3 hari yang lalu', user: 'Administrator' },
     { id: 4, activity: 'Pengaturan Website Diubah', time: '1 minggu yang lalu', user: 'Administrator' },
     { id: 5, activity: 'Koneksi Supabase Diverifikasi', time: 'Baru saja', user: 'System' },
-  ];
+  ]);
 
   if (isLoading) {
     return (

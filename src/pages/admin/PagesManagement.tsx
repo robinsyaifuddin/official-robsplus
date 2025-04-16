@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Card, CardContent, CardDescription, CardHeader, CardTitle 
 } from "@/components/ui/card";
@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { 
   Plus, Search, Edit, Trash2, Eye, MoreHorizontal, FileText, 
-  Home, Info, PhoneCall, Package, Image as ImageIcon
+  Home, Info, PhoneCall, Package, Image as ImageIcon, Loader2, RefreshCw, Save
 } from 'lucide-react';
 import {
   Dialog,
@@ -30,45 +30,244 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { supabase } from '@/integrations/supabase/client';
+
+// Define page type interface
+interface Page {
+  id: string;
+  title: string;
+  slug: string;
+  content?: string;
+  status: string;
+  created_at: string;
+  updated_at: string;
+}
 
 const PagesManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [selectedPage, setSelectedPage] = useState<any>(null);
+  const [selectedPage, setSelectedPage] = useState<Page | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [pages, setPages] = useState<Page[]>([]);
+  const [newPage, setNewPage] = useState({
+    title: '',
+    slug: '',
+    content: '',
+    status: 'published'
+  });
+  const [editedPage, setEditedPage] = useState({
+    title: '',
+    slug: '',
+    content: '',
+    status: ''
+  });
   
-  // Mock data for pages
-  const pages = [
-    { id: 1, title: 'Beranda', slug: '/', status: 'Published', lastUpdated: '2 jam yang lalu', icon: <Home className="h-4 w-4" /> },
-    { id: 2, title: 'Layanan', slug: '/services', status: 'Published', lastUpdated: '1 hari yang lalu', icon: <Package className="h-4 w-4" /> },
-    { id: 3, title: 'Portofolio', slug: '/portfolio', status: 'Published', lastUpdated: '3 hari yang lalu', icon: <ImageIcon className="h-4 w-4" /> },
-    { id: 4, title: 'Tentang Kami', slug: '/about', status: 'Published', lastUpdated: '1 minggu yang lalu', icon: <Info className="h-4 w-4" /> },
-    { id: 5, title: 'Kontak', slug: '/contact', status: 'Published', lastUpdated: '2 minggu yang lalu', icon: <PhoneCall className="h-4 w-4" /> },
-  ];
-
+  // Icons for page types
+  const getPageIcon = (slug: string) => {
+    if (slug === '/' || slug.includes('home')) return <Home className="h-4 w-4" />;
+    if (slug.includes('service')) return <Package className="h-4 w-4" />;
+    if (slug.includes('portfolio')) return <ImageIcon className="h-4 w-4" />;
+    if (slug.includes('about')) return <Info className="h-4 w-4" />;
+    if (slug.includes('contact')) return <PhoneCall className="h-4 w-4" />;
+    return <FileText className="h-4 w-4" />;
+  };
+  
+  const fetchPages = async () => {
+    try {
+      setIsLoading(true);
+      
+      const { data, error } = await supabase
+        .from('pages')
+        .select('*')
+        .order('updated_at', { ascending: false });
+      
+      if (error) {
+        throw error;
+      }
+      
+      if (data) {
+        setPages(data);
+      }
+    } catch (error: any) {
+      console.error("Error fetching pages:", error.message);
+      toast.error("Gagal memuat halaman", {
+        description: error.message
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  useEffect(() => {
+    fetchPages();
+  }, []);
+  
+  const handleSlugChange = (value: string) => {
+    // Auto-generate slug from title
+    const slug = value
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-');
+    
+    if (isEditDialogOpen) {
+      setEditedPage(prev => ({ ...prev, slug }));
+    } else {
+      setNewPage(prev => ({ ...prev, slug }));
+    }
+  };
+  
+  const handleAddPage = async () => {
+    try {
+      if (!newPage.title || !newPage.slug) {
+        toast.error("Data tidak lengkap", {
+          description: "Judul dan slug diperlukan"
+        });
+        return;
+      }
+      
+      const finalSlug = newPage.slug.startsWith('/') ? newPage.slug : `/${newPage.slug}`;
+      
+      const { data, error } = await supabase
+        .from('pages')
+        .insert([
+          {
+            title: newPage.title,
+            slug: finalSlug,
+            content: newPage.content,
+            status: newPage.status
+          }
+        ])
+        .select();
+      
+      if (error) throw error;
+      
+      toast.success("Halaman baru berhasil ditambahkan");
+      setIsAddDialogOpen(false);
+      setNewPage({
+        title: '',
+        slug: '',
+        content: '',
+        status: 'published'
+      });
+      
+      // Refresh pages list
+      fetchPages();
+    } catch (error: any) {
+      console.error("Error adding page:", error.message);
+      toast.error("Gagal menambahkan halaman", {
+        description: error.message
+      });
+    }
+  };
+  
+  const handleEdit = (page: Page) => {
+    setSelectedPage(page);
+    setEditedPage({
+      title: page.title,
+      slug: page.slug,
+      content: page.content || '',
+      status: page.status
+    });
+    setIsEditDialogOpen(true);
+  };
+  
+  const handleSaveEdit = async () => {
+    try {
+      if (!selectedPage || !editedPage.title || !editedPage.slug) {
+        toast.error("Data tidak lengkap", {
+          description: "Judul dan slug diperlukan"
+        });
+        return;
+      }
+      
+      const finalSlug = editedPage.slug.startsWith('/') ? editedPage.slug : `/${editedPage.slug}`;
+      
+      const { error } = await supabase
+        .from('pages')
+        .update({
+          title: editedPage.title,
+          slug: finalSlug,
+          content: editedPage.content,
+          status: editedPage.status,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', selectedPage.id);
+      
+      if (error) throw error;
+      
+      toast.success("Halaman berhasil diperbarui");
+      setIsEditDialogOpen(false);
+      
+      // Refresh pages list
+      fetchPages();
+    } catch (error: any) {
+      console.error("Error updating page:", error.message);
+      toast.error("Gagal memperbarui halaman", {
+        description: error.message
+      });
+    }
+  };
+  
+  const handleDeletePage = async (id: string) => {
+    if (confirm("Anda yakin ingin menghapus halaman ini?")) {
+      try {
+        const { error } = await supabase
+          .from('pages')
+          .delete()
+          .eq('id', id);
+        
+        if (error) throw error;
+        
+        toast.success("Halaman berhasil dihapus");
+        
+        // Refresh pages list
+        fetchPages();
+      } catch (error: any) {
+        console.error("Error deleting page:", error.message);
+        toast.error("Gagal menghapus halaman", {
+          description: error.message
+        });
+      }
+    }
+  };
+  
+  const formatTimeAgo = (dateString: string) => {
+    const now = new Date();
+    const past = new Date(dateString);
+    const diffMs = now.getTime() - past.getTime();
+    const diffSec = Math.round(diffMs / 1000);
+    const diffMin = Math.round(diffSec / 60);
+    const diffHour = Math.round(diffMin / 60);
+    const diffDay = Math.round(diffHour / 24);
+    
+    if (diffSec < 60) return `${diffSec} detik yang lalu`;
+    if (diffMin < 60) return `${diffMin} menit yang lalu`;
+    if (diffHour < 24) return `${diffHour} jam yang lalu`;
+    if (diffDay < 7) return `${diffDay} hari yang lalu`;
+    
+    return new Date(dateString).toLocaleDateString('id-ID', { 
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+  
   const filteredPages = pages.filter(page =>
     page.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     page.slug.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleEdit = (page: any) => {
-    setSelectedPage(page);
-    setIsEditDialogOpen(true);
-  };
-
-  const handleSaveEdit = () => {
-    toast.success("Halaman berhasil diperbarui");
-    setIsEditDialogOpen(false);
-  };
-
-  const handleAddPage = () => {
-    toast.success("Halaman baru berhasil ditambahkan");
-    setIsAddDialogOpen(false);
-  };
-
-  const handleDeletePage = (id: number) => {
-    toast.success("Halaman berhasil dihapus");
-  };
+  if (isLoading) {
+    return (
+      <div className="flex h-full items-center justify-center p-12">
+        <div className="flex flex-col items-center gap-2">
+          <Loader2 className="h-8 w-8 animate-spin text-cyberpunk" />
+          <p>Memuat data halaman...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -87,6 +286,13 @@ const PagesManagement = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
+          <Button 
+            onClick={() => fetchPages()}
+            variant="outline"
+            className="border-gray-700"
+          >
+            <RefreshCw className="h-4 w-4" />
+          </Button>
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
             <DialogTrigger asChild>
               <Button className="bg-cyberpunk hover:bg-cyberpunk-light">
@@ -110,6 +316,11 @@ const PagesManagement = () => {
                     id="title"
                     placeholder="Judul Halaman"
                     className="col-span-3 bg-dark border-gray-700"
+                    value={newPage.title}
+                    onChange={(e) => {
+                      setNewPage({...newPage, title: e.target.value});
+                      handleSlugChange(e.target.value);
+                    }}
                   />
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
@@ -120,6 +331,8 @@ const PagesManagement = () => {
                     id="slug"
                     placeholder="slug-halaman"
                     className="col-span-3 bg-dark border-gray-700"
+                    value={newPage.slug}
+                    onChange={(e) => setNewPage({...newPage, slug: e.target.value})}
                   />
                 </div>
                 <div className="grid grid-cols-4 items-start gap-4">
@@ -130,6 +343,8 @@ const PagesManagement = () => {
                     id="content"
                     placeholder="Konten halaman"
                     className="col-span-3 min-h-[150px] bg-dark border-gray-700"
+                    value={newPage.content}
+                    onChange={(e) => setNewPage({...newPage, content: e.target.value})}
                   />
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
@@ -139,6 +354,8 @@ const PagesManagement = () => {
                   <select
                     id="status"
                     className="col-span-3 rounded-md border border-gray-700 bg-dark px-3 py-2 text-white"
+                    value={newPage.status}
+                    onChange={(e) => setNewPage({...newPage, status: e.target.value})}
                   >
                     <option value="published">Published</option>
                     <option value="draft">Draft</option>
@@ -157,6 +374,7 @@ const PagesManagement = () => {
                   onClick={handleAddPage}
                   className="bg-cyberpunk hover:bg-cyberpunk-light"
                 >
+                  <Save className="mr-2 h-4 w-4" />
                   Simpan
                 </Button>
               </DialogFooter>
@@ -174,7 +392,7 @@ const PagesManagement = () => {
           <Table>
             <TableHeader>
               <TableRow className="border-gray-700 hover:bg-gray-800">
-                <TableHead className="w-12">#</TableHead>
+                <TableHead className="w-12">ID</TableHead>
                 <TableHead>Halaman</TableHead>
                 <TableHead>Slug</TableHead>
                 <TableHead>Status</TableHead>
@@ -189,11 +407,11 @@ const PagesManagement = () => {
                     key={page.id} 
                     className="border-gray-700 hover:bg-gray-800"
                   >
-                    <TableCell className="font-medium">{page.id}</TableCell>
+                    <TableCell className="font-medium">{page.id.substring(0, 6)}...</TableCell>
                     <TableCell>
                       <div className="flex items-center">
                         <div className="mr-2 flex h-7 w-7 items-center justify-center rounded-full bg-gray-700">
-                          {page.icon}
+                          {getPageIcon(page.slug)}
                         </div>
                         {page.title}
                       </div>
@@ -201,11 +419,11 @@ const PagesManagement = () => {
                     <TableCell>{page.slug}</TableCell>
                     <TableCell>
                       <div className="flex items-center">
-                        <div className="mr-2 h-2 w-2 rounded-full bg-green-500"></div>
-                        {page.status}
+                        <div className={`mr-2 h-2 w-2 rounded-full ${page.status === 'published' ? 'bg-green-500' : 'bg-yellow-500'}`}></div>
+                        {page.status === 'published' ? 'Published' : 'Draft'}
                       </div>
                     </TableCell>
-                    <TableCell>{page.lastUpdated}</TableCell>
+                    <TableCell>{formatTimeAgo(page.updated_at)}</TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -269,7 +487,8 @@ const PagesManagement = () => {
                 </label>
                 <Input
                   id="edit-title"
-                  defaultValue={selectedPage.title}
+                  value={editedPage.title}
+                  onChange={(e) => setEditedPage({...editedPage, title: e.target.value})}
                   className="col-span-3 bg-dark border-gray-700"
                 />
               </div>
@@ -279,7 +498,8 @@ const PagesManagement = () => {
                 </label>
                 <Input
                   id="edit-slug"
-                  defaultValue={selectedPage.slug}
+                  value={editedPage.slug}
+                  onChange={(e) => setEditedPage({...editedPage, slug: e.target.value})}
                   className="col-span-3 bg-dark border-gray-700"
                 />
               </div>
@@ -291,7 +511,8 @@ const PagesManagement = () => {
                   id="edit-content"
                   placeholder="Konten halaman"
                   className="col-span-3 min-h-[150px] bg-dark border-gray-700"
-                  defaultValue="Konten halaman ini akan ditampilkan di website."
+                  value={editedPage.content}
+                  onChange={(e) => setEditedPage({...editedPage, content: e.target.value})}
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
@@ -301,7 +522,8 @@ const PagesManagement = () => {
                 <select
                   id="edit-status"
                   className="col-span-3 rounded-md border border-gray-700 bg-dark px-3 py-2 text-white"
-                  defaultValue={selectedPage.status.toLowerCase()}
+                  value={editedPage.status}
+                  onChange={(e) => setEditedPage({...editedPage, status: e.target.value})}
                 >
                   <option value="published">Published</option>
                   <option value="draft">Draft</option>
@@ -321,6 +543,7 @@ const PagesManagement = () => {
               onClick={handleSaveEdit}
               className="bg-cyberpunk hover:bg-cyberpunk-light"
             >
+              <Save className="mr-2 h-4 w-4" />
               Simpan Perubahan
             </Button>
           </DialogFooter>
