@@ -1,22 +1,59 @@
 
-import React, { useEffect, useState } from 'react';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState, Suspense } from 'react';
+import { Outlet, useLocation, useNavigate, Link } from 'react-router-dom';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import AdminHeader from './AdminHeader';
 import { useAuth } from '@/hooks/useAuth';
-import { Loader2, Database, LayoutDashboard, FileText, ShoppingBag, Image, Users, Settings, Link, Key } from 'lucide-react';
+import { 
+  Loader2, Database, LayoutDashboard, FileText, ShoppingBag, 
+  Image, Users, Settings, Link as LinkIcon, Key 
+} from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
+import { useQuery } from '@tanstack/react-query';
+
+// Custom lazy loading component with spinner
+const LazyLoadingSpinner = () => (
+  <div className="flex items-center justify-center h-full p-8">
+    <Loader2 className="h-8 w-8 animate-spin text-cyberpunk" />
+    <span className="ml-2 text-gray-400">Memuat...</span>
+  </div>
+);
 
 const AdminLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isAdmin, loading } = useAuth();
   const [isReady, setIsReady] = useState(false);
-  const [supabaseStatus, setSupabaseStatus] = useState<'checking' | 'connected' | 'error'>('checking');
   
-  // Verify Supabase connection
+  // Use React Query for Supabase connection status
+  const { data: supabaseStatus, isLoading: checkingSupabase } = useQuery({
+    queryKey: ['supabase-connection'],
+    queryFn: async () => {
+      try {
+        console.log("AdminLayout: Checking Supabase connection...");
+        const { error } = await supabase.from('settings').select('id').limit(1);
+        
+        if (error) {
+          console.error("AdminLayout: Supabase connection error:", error);
+          toast.error("Koneksi Supabase gagal", {
+            description: "Terjadi masalah saat terhubung ke database. Coba refresh halaman."
+          });
+          return 'error';
+        } 
+        
+        console.log("AdminLayout: Supabase connection successful");
+        return 'connected';
+      } catch (e) {
+        console.error("AdminLayout: Failed to connect to Supabase:", e);
+        return 'error';
+      }
+    },
+    staleTime: 60000, // Cache for 1 minute
+    retry: 2
+  });
+  
   useEffect(() => {
     console.log("AdminLayout: Initial render", { 
       path: location.pathname,
@@ -25,34 +62,10 @@ const AdminLayout = () => {
       manualSession: localStorage.getItem('manual_admin_session')
     });
     
-    const checkSupabaseConnection = async () => {
-      try {
-        console.log("AdminLayout: Checking Supabase connection...");
-        const { error } = await supabase.from('settings').select('id').limit(1);
-        
-        if (error) {
-          console.error("AdminLayout: Supabase connection error:", error);
-          setSupabaseStatus('error');
-          toast.error("Koneksi Supabase gagal", {
-            description: "Terjadi masalah saat terhubung ke database. Coba refresh halaman."
-          });
-        } else {
-          console.log("AdminLayout: Supabase connection successful");
-          setSupabaseStatus('connected');
-        }
-      } catch (e) {
-        console.error("AdminLayout: Failed to connect to Supabase:", e);
-        setSupabaseStatus('error');
-      } finally {
-        // Continue with rendering even if there's a connection error
-        // The error state will be displayed in the UI
-        setTimeout(() => {
-          setIsReady(true);
-        }, 300);
-      }
-    };
-    
-    checkSupabaseConnection();
+    // Set ready state after a short delay to prevent flicker
+    setTimeout(() => {
+      setIsReady(true);
+    }, 300);
     
     // Check if user is admin
     if (!loading) {
@@ -74,7 +87,7 @@ const AdminLayout = () => {
     }
   }, [location, loading, user, isAdmin, navigate]);
 
-  if (loading || !isReady) {
+  if (loading || !isReady || checkingSupabase) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-dark">
         <div className="flex flex-col items-center gap-2">
@@ -110,7 +123,9 @@ const AdminLayout = () => {
         <AdminSidebar />
         <main className="flex-1 overflow-auto bg-dark p-6">
           <ScrollArea className="h-full w-full">
-            <Outlet />
+            <Suspense fallback={<LazyLoadingSpinner />}>
+              <Outlet />
+            </Suspense>
           </ScrollArea>
         </main>
       </div>
@@ -159,7 +174,7 @@ const AdminSidebar = () => {
       path: '/admin/website' 
     },
     { 
-      icon: Link, 
+      icon: LinkIcon, 
       label: 'Integrasi', 
       path: '/admin/integration' 
     },
@@ -179,9 +194,9 @@ const AdminSidebar = () => {
       
       <div className="mt-2 px-2">
         {sidebarItems.map((item) => (
-          <button
+          <Link
             key={item.path}
-            onClick={() => navigate(item.path)}
+            to={item.path}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-md text-left mb-1 ${
               isActive(item.path)
                 ? 'bg-cyberpunk text-white'
@@ -192,7 +207,7 @@ const AdminSidebar = () => {
               <item.icon className="h-5 w-5" />
             </span>
             <span>{item.label}</span>
-          </button>
+          </Link>
         ))}
       </div>
     </div>
