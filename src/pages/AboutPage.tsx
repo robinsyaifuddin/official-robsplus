@@ -1,4 +1,3 @@
-
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import ThreeScene from "../components/ThreeScene";
@@ -34,7 +33,7 @@ const AboutPage = () => {
   const ceoProfile = {
     name: "Robin Syaifuddin",
     role: "CEO & Founder",
-    image: "bg-gradient-to-br from-indigo-500 to-purple-700",
+    image: "/lovable-uploads/5f8808a6-725b-4a91-b863-f201bc713ceb.png",
     description: "Seorang penggiat digital dan pengembangan diri yang berdedikasi untuk memberdayakan individu dan organisasi melalui solusi digital inovatif.",
     socials: [
       { icon: <Github size={18} />, url: "#github" },
@@ -229,34 +228,43 @@ const AboutPage = () => {
                 </p>
               </div>
               
-              <div className="max-w-lg mx-auto">
-                <Card className="bg-dark-secondary border-cyberpunk/20 overflow-hidden shadow-lg shadow-cyberpunk/5 transform transition-all duration-300 hover:scale-105">
-                  <div className={`${ceoProfile.image} h-48 w-full`}></div>
-                  <CardHeader className="relative">
-                    <div className="absolute -top-14 left-1/2 transform -translate-x-1/2">
-                      <Avatar className="h-28 w-28 border-4 border-dark-secondary">
-                        <AvatarFallback className="bg-cyberpunk text-2xl font-bold text-white">RS</AvatarFallback>
-                      </Avatar>
+              <div className="max-w-4xl mx-auto px-4">
+                <Card className="bg-dark-secondary/80 backdrop-blur-lg border-cyberpunk/20 overflow-hidden shadow-xl shadow-cyberpunk/5 hover:shadow-cyberpunk/10 transition-all duration-500">
+                  <div className="md:flex items-center gap-8 p-8">
+                    <div className="md:w-1/2 mb-8 md:mb-0">
+                      <div className="relative group">
+                        <div className="absolute -inset-1 bg-gradient-to-r from-cyberpunk to-cyberpunk-light rounded-lg blur opacity-30 group-hover:opacity-50 transition duration-1000"></div>
+                        <div className="relative overflow-hidden rounded-lg transform perspective-1000 group-hover:rotate-y-12 transition-all duration-500">
+                          <img 
+                            src={ceoProfile.image} 
+                            alt={ceoProfile.name}
+                            className="w-full h-auto rounded-lg transform transition-transform duration-500 group-hover:scale-110"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-tr from-cyberpunk/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        </div>
+                        <div className="absolute -inset-1 bg-gradient-to-r from-cyberpunk/20 to-transparent blur-xl opacity-0 group-hover:opacity-30 transition duration-1000"></div>
+                      </div>
                     </div>
-                    <div className="pt-16">
-                      <CardTitle className="text-center text-2xl">{ceoProfile.name}</CardTitle>
-                      <CardDescription className="text-center text-cyberpunk">{ceoProfile.role}</CardDescription>
+                    
+                    <div className="md:w-1/2">
+                      <div className="space-y-4">
+                        <h3 className="text-3xl font-bold text-white">{ceoProfile.name}</h3>
+                        <p className="text-cyberpunk text-lg font-semibold">{ceoProfile.role}</p>
+                        <p className="text-gray-300">{ceoProfile.description}</p>
+                        <div className="flex gap-4 pt-4">
+                          {ceoProfile.socials.map((social, index) => (
+                            <a 
+                              key={index}
+                              href={social.url}
+                              className="w-10 h-10 rounded-full bg-dark-secondary flex items-center justify-center hover:bg-cyberpunk hover:scale-110 transition-all duration-300"
+                            >
+                              {social.icon}
+                            </a>
+                          ))}
+                        </div>
+                      </div>
                     </div>
-                  </CardHeader>
-                  <CardContent className="text-center">
-                    <p className="text-gray-300 mb-4">{ceoProfile.description}</p>
-                    <div className="flex justify-center gap-3 mt-4">
-                      {ceoProfile.socials.map((social, index) => (
-                        <a 
-                          key={index}
-                          href={social.url}
-                          className="w-8 h-8 rounded-full bg-dark flex items-center justify-center hover:bg-cyberpunk transition-all duration-300"
-                        >
-                          {social.icon}
-                        </a>
-                      ))}
-                    </div>
-                  </CardContent>
+                  </div>
                 </Card>
               </div>
             </div>
