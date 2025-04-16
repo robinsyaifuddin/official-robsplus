@@ -2,73 +2,222 @@
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import ThreeScene from "../components/ThreeScene";
-import { Monitor, BookOpen, FileDigit, Code, Layout, Cpu, Database, PenTool, GraduationCap } from "lucide-react";
+import { Book, FileText, PenTool, Presentation, FileCheck, HelpCircle, Globe, Image, Video, Users, XCircle, GraduationCap, Layout, Database, ArrowRight } from "lucide-react";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
 
 const ServicesPage = () => {
-  const serviceCategories = [
+  const services = [
     {
-      title: "Layanan Tugas",
-      icon: <Monitor className="w-8 h-8 text-cyberpunk" />,
-      description: "Solusi komprehensif untuk berbagai kebutuhan tugas akademik dan profesional dengan pendekatan yang terstruktur dan hasil berkualitas tinggi.",
+      id: "jasa-tugas",
+      title: "Jasa Tugas",
+      icon: <Book className="w-8 h-8 text-cyberpunk" />,
+      description: "Solusi komprehensif untuk berbagai kebutuhan tugas akademik dengan pendekatan profesional dan hasil berkualitas tinggi.",
+      packages: [
+        {
+          name: "Paket Dasar",
+          price: "Rp 5.000 - Rp 50.000",
+          features: [
+            "Esai pendek dan laporan sederhana",
+            "Tata bahasa yang baik dan struktur rapi",
+            "Parafrasa dasar untuk menurunkan plagiasi",
+            "Perapihan format tugas",
+            "1x revisi"
+          ]
+        },
+        {
+          name: "Paket Menengah",
+          price: "Rp 50.000 - Rp 100.000",
+          features: [
+            "Makalah dan proposal kompleks",
+            "Penelitian mendalam dan analisis data",
+            "Penurunan plagiasi tingkat lanjut",
+            "PPT presentasi profesional",
+            "2x revisi"
+          ]
+        },
+        {
+          name: "Paket Lanjutan",
+          price: "Rp 100.000 - Rp 150.000+",
+          features: [
+            "KTI dan jurnal penelitian",
+            "Penelitian ekstensif dengan analisis statistik",
+            "Standar akademik tinggi",
+            "Konsultasi intensif",
+            "Revisi tidak terbatas"
+          ]
+        }
+      ],
       services: [
         {
-          title: "Konsultasi Tugas",
-          icon: <PenTool size={20} className="text-cyberpunk" />,
-          description: "Layanan konsultasi untuk membantu menyelesaikan tugas dengan panduan dari ahli di bidangnya."
+          icon: <FileText size={20} />,
+          name: "Karya Tulis Ilmiah (KTI)",
+          description: "Penulisan KTI dengan standar akademik tinggi dan metodologi penelitian yang tepat."
         },
         {
-          title: "Pengerjaan Proyek",
-          icon: <Code size={20} className="text-cyberpunk" />,
-          description: "Pengerjaan proyek dari awal hingga akhir dengan metode yang efisien dan profesional."
+          icon: <Book size={20} />,
+          name: "Makalah & Esai",
+          description: "Penulisan makalah dan esai dengan struktur yang baik dan argumentasi yang kuat."
         },
         {
-          title: "Revisi & Pengecekan",
-          icon: <Layout size={20} className="text-cyberpunk" />,
-          description: "Layanan revisi dan pengecekan untuk memastikan kualitas hasil pekerjaan yang optimal."
+          icon: <FileCheck size={20} />,
+          name: "Laporan & Proposal",
+          description: "Penyusunan laporan dan proposal yang profesional dan terstruktur."
+        },
+        {
+          icon: <Presentation size={20} />,
+          name: "Presentasi PowerPoint",
+          description: "Pembuatan slide presentasi yang menarik dan informatif."
+        },
+        {
+          icon: <PenTool size={20} />,
+          name: "Parafrasa/Penurunan Plagiasi",
+          description: "Teknik penurunan plagiasi dengan tetap mempertahankan makna asli."
+        },
+        {
+          icon: <HelpCircle size={20} />,
+          name: "Konsultasi Tugas",
+          description: "Bimbingan dan konsultasi untuk pengerjaan tugas akademik."
         }
       ]
     },
     {
-      title: "Layanan Digital",
-      icon: <FileDigit className="w-8 h-8 text-cyberpunk" />,
-      description: "Solusi digital terdepan untuk membantu bisnis berkembang di era modern dengan pendekatan yang inovatif dan berkelanjutan.",
+      id: "jasa-digital",
+      title: "Jasa Digital",
+      icon: <Globe className="w-8 h-8 text-cyberpunk" />,
+      description: "Solusi digital terdepan untuk membantu bisnis Anda berkembang di era modern dengan pendekatan yang inovatif.",
+      packages: [
+        {
+          name: "Paket Pemula",
+          price: "Rp 50.000 - Rp 100.000",
+          features: [
+            "Website statis dengan template dasar",
+            "Logo atau poster sederhana",
+            "Editing video pendek",
+            "Peningkatan followers terbatas",
+            "1x revisi"
+          ]
+        },
+        {
+          name: "Paket Profesional",
+          price: "Rp 100.000 - Rp 350.000",
+          features: [
+            "Website dinamis dengan fitur custom",
+            "Desain logo/poster kompleks",
+            "Video dengan efek khusus",
+            "Peningkatan engagement signifikan",
+            "3x revisi"
+          ]
+        },
+        {
+          name: "Paket Premium",
+          price: "Rp 350.000 - Rp 650.000",
+          features: [
+            "Website E-commerce lengkap",
+            "Branding sosial media komprehensif",
+            "Film/iklan komersil profesional",
+            "Penanganan akun bermasalah",
+            "Revisi tidak terbatas"
+          ]
+        }
+      ],
       services: [
         {
-          title: "Web Development",
-          icon: <Code size={20} className="text-cyberpunk" />,
-          description: "Pengembangan website dengan teknologi terkini yang responsif dan user-friendly."
+          icon: <Globe size={20} />,
+          name: "Pembuatan Website",
+          description: "Pembuatan website profesional dengan desain responsif dan fitur modern."
         },
         {
-          title: "Digital Marketing",
-          icon: <Layout size={20} className="text-cyberpunk" />,
-          description: "Strategi pemasaran digital untuk meningkatkan visibilitas dan konversi bisnis Anda."
+          icon: <Image size={20} />,
+          name: "Desain Logo/Poster",
+          description: "Desain grafis profesional untuk kebutuhan branding bisnis Anda."
         },
         {
-          title: "UI/UX Design",
-          icon: <PenTool size={20} className="text-cyberpunk" />,
-          description: "Desain antarmuka pengguna yang intuitif dan pengalaman pengguna yang optimal."
+          icon: <Video size={20} />,
+          name: "Editing Video/Film",
+          description: "Editing video profesional untuk konten promosi atau dokumentasi."
+        },
+        {
+          icon: <Users size={20} />,
+          name: "Peningkatan Media Sosial",
+          description: "Strategi peningkatan engagement dan followers media sosial."
+        },
+        {
+          icon: <XCircle size={20} />,
+          name: "Pelaporan Akun",
+          description: "Bantuan penanganan dan pelaporan akun media sosial bermasalah."
         }
       ]
     },
     {
-      title: "Layanan Belajar",
-      icon: <BookOpen className="w-8 h-8 text-cyberpunk" />,
-      description: "Program pembelajaran interaktif yang dirancang untuk meningkatkan keterampilan dan pengetahuan dengan metode yang efektif dan menyenangkan.",
+      id: "jasa-pembelajaran",
+      title: "Jasa Pembelajaran",
+      icon: <GraduationCap className="w-8 h-8 text-cyberpunk" />,
+      description: "Program pembelajaran interaktif untuk meningkatkan keterampilan digital Anda dengan metode yang efektif.",
+      packages: [
+        {
+          name: "Sesi Individual",
+          price: "Rp 75.000 - Rp 150.000",
+          features: [
+            "Pembelajaran one-on-one",
+            "Fokus pada topik spesifik",
+            "Sesi tanya jawab",
+            "Latihan praktis",
+            "Materi dasar"
+          ]
+        },
+        {
+          name: "Paket Dasar",
+          price: "Rp 150.000 - Rp 250.000",
+          features: [
+            "Kursus singkat terstruktur",
+            "Materi pembelajaran lengkap",
+            "Akses online/offline",
+            "Latihan project",
+            "Level menengah"
+          ]
+        },
+        {
+          name: "Paket Lanjutan",
+          price: "Rp 250.000 - Rp 400.000+",
+          features: [
+            "Kursus intensif mendalam",
+            "Mentoring berkelanjutan",
+            "Project praktik kompleks",
+            "Sertifikat keahlian",
+            "Level advanced"
+          ]
+        }
+      ],
       services: [
         {
-          title: "Tutorial Online",
-          icon: <Cpu size={20} className="text-cyberpunk" />,
-          description: "Tutorial langkah demi langkah untuk mempelajari berbagai keterampilan dan pengetahuan baru."
+          icon: <Globe size={20} />,
+          name: "Pembuatan Website",
+          description: "Pembelajaran pembuatan website dari dasar hingga advanced."
         },
         {
-          title: "Mentoring Profesional",
-          icon: <Database size={20} className="text-cyberpunk" />,
-          description: "Program mentoring one-on-one dengan profesional berpengalaman di bidangnya."
+          icon: <Layout size={20} />,
+          name: "Desain Grafis",
+          description: "Kursus desain grafis untuk kebutuhan profesional."
         },
         {
-          title: "Workshop Interaktif",
-          icon: <GraduationCap size={20} className="text-cyberpunk" />,
-          description: "Workshop interaktif untuk belajar dengan cara yang lebih hands-on dan kolaboratif."
+          icon: <Database size={20} />,
+          name: "Digital Marketing",
+          description: "Pembelajaran strategi pemasaran digital yang efektif."
+        },
+        {
+          icon: <Users size={20} />,
+          name: "Instagram Branding",
+          description: "Teknik branding dan marketing melalui Instagram."
+        },
+        {
+          icon: <FileText size={20} />,
+          name: "Microsoft Office",
+          description: "Pelatihan Microsoft Office untuk produktivitas kerja."
         }
       ]
     }
@@ -90,69 +239,89 @@ const ServicesPage = () => {
                 Kami menawarkan berbagai layanan profesional untuk memenuhi kebutuhan digital dan akademik Anda dengan pendekatan yang modern dan efektif.
               </p>
             </div>
-            
-            {serviceCategories.map((category, index) => (
-              <div 
-                key={index} 
-                id={category.title.toLowerCase().replace(/\s+/g, '-')}
-                className={`mb-20 ${index % 2 === 1 ? 'md:flex-row-reverse' : ''} md:flex items-start gap-10`}
-              >
-                <div className="md:w-1/3 mb-8 md:mb-0">
-                  <div className="bg-dark-secondary p-8 rounded-lg border border-cyberpunk/20 sticky top-24">
-                    <div className="p-4 bg-cyberpunk/10 inline-block rounded-lg mb-6">
-                      {category.icon}
+
+            <Tabs defaultValue="jasa-tugas" className="w-full">
+              <TabsList className="grid w-full grid-cols-1 md:grid-cols-3 mb-8">
+                {services.map((service) => (
+                  <TabsTrigger
+                    key={service.id}
+                    value={service.id}
+                    className="data-[state=active]:bg-cyberpunk data-[state=active]:text-white"
+                  >
+                    <div className="flex items-center gap-2">
+                      {service.icon}
+                      <span>{service.title}</span>
                     </div>
-                    <h2 className="text-3xl font-bold mb-4">{category.title}</h2>
-                    <p className="text-gray-300 mb-8">{category.description}</p>
-                    <button className="cyberpunk-button w-full">
-                      Konsultasi Sekarang
-                    </button>
-                  </div>
-                </div>
-                
-                <div className="md:w-2/3">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {category.services.map((service, serviceIndex) => (
-                      <div key={serviceIndex} className="cyberpunk-card hover:translate-y-[-5px] transition-all duration-300">
-                        <div className="flex items-center mb-4">
-                          <div className="p-3 bg-cyberpunk/10 rounded-lg mr-4">
-                            {service.icon}
-                          </div>
-                          <h3 className="text-xl font-semibold">{service.title}</h3>
-                        </div>
-                        <p className="text-gray-300">{service.description}</p>
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+
+              {services.map((service) => (
+                <TabsContent key={service.id} value={service.id}>
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {service.packages.map((pkg, index) => (
+                      <div 
+                        key={index}
+                        className="bg-dark-secondary p-6 rounded-lg border border-cyberpunk/20 hover:border-cyberpunk/50 transition-all duration-300"
+                      >
+                        <h3 className="text-xl font-semibold text-cyberpunk mb-2">{pkg.name}</h3>
+                        <p className="text-lg font-medium mb-4">{pkg.price}</p>
+                        <ul className="space-y-3 mb-6">
+                          {pkg.features.map((feature, idx) => (
+                            <li key={idx} className="flex items-start gap-2 text-gray-300">
+                              <div className="w-1.5 h-1.5 bg-cyberpunk rounded-full mt-2"></div>
+                              <span>{feature}</span>
+                            </li>
+                          ))}
+                        </ul>
+                        <button className="w-full cyberpunk-button">
+                          Pilih Paket
+                        </button>
                       </div>
                     ))}
                   </div>
-                  
-                  <div className="mt-12 bg-dark-secondary p-8 rounded-lg border border-cyberpunk/20">
-                    <h3 className="text-2xl font-semibold mb-6">Mengapa Memilih {category.title} Kami?</h3>
-                    
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+
+                  <div className="mt-12">
+                    <h3 className="text-2xl font-semibold mb-8">Layanan yang Tersedia</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {service.services.map((item, index) => (
+                        <div 
+                          key={index}
+                          className="p-6 bg-dark/60 backdrop-blur-sm border border-cyberpunk/20 rounded-lg hover:border-cyberpunk/50 transition-all duration-300"
+                        >
+                          <div className="flex items-center gap-3 mb-4">
+                            <div className="p-2 bg-cyberpunk/10 rounded-lg">
+                              {item.icon}
+                            </div>
+                            <h4 className="font-medium">{item.name}</h4>
+                          </div>
+                          <p className="text-gray-300">{item.description}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="mt-12 p-8 bg-dark-secondary rounded-lg border border-cyberpunk/20">
+                    <h3 className="text-2xl font-semibold mb-6">Mengapa Memilih {service.title} Kami?</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {[
                         "Tim profesional berpengalaman",
                         "Hasil berkualitas tinggi",
                         "Harga yang kompetitif",
                         "Pengerjaan tepat waktu",
-                        "Revisi dan dukungan pasca-layanan",
-                        "Metode yang terstruktur dan sistematis"
+                        "Revisi sesuai paket",
+                        "Garansi kepuasan"
                       ].map((point, i) => (
-                        <div key={i} className="flex items-center">
-                          <div className="w-2 h-2 rounded-full bg-cyberpunk mr-2"></div>
+                        <div key={i} className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-cyberpunk"></div>
                           <p className="text-gray-300">{point}</p>
                         </div>
                       ))}
                     </div>
-                    
-                    <div className="p-4 border border-cyberpunk/30 rounded-lg bg-dark/60">
-                      <p className="italic text-gray-300 text-center">
-                        "Kami berkomitmen untuk memberikan layanan terbaik yang memenuhi kebutuhan dan melampaui harapan klien kami."
-                      </p>
-                    </div>
                   </div>
-                </div>
-              </div>
-            ))}
+                </TabsContent>
+              ))}
+            </Tabs>
           </div>
         </section>
       </main>
