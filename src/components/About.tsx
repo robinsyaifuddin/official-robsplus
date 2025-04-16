@@ -9,25 +9,25 @@ const About = () => {
         <div className="text-center mb-16">
           <h2 className="section-title mx-auto">Tentang Kami</h2>
           <p className="text-gray-300 max-w-2xl mx-auto mt-6">
-            Kami adalah tim profesional berdedikasi yang fokus memberikan solusi digital inovatif untuk membantu bisnis Anda tumbuh dan berkembang.
+            Selamat datang di ROBsPlus, agensi yang didirikan pada tahun 2021 dengan misi untuk memberdayakan mahasiswa, masyarakat, pemerintah, dan profesional melalui layanan jasa tugas, digital, dan pembelajaran yang inovatif.
           </p>
         </div>
         
         <div className="md:flex gap-12 items-center mb-16">
           <div className="md:w-1/2 mb-8 md:mb-0">
             <div className="relative">
-              <div className="bg-dark/70 backdrop-blur-sm rounded-lg p-6 border border-cyberpunk/20 transition-all duration-300 hover:-translate-y-2">
+              <div className="bg-dark/70 backdrop-blur-sm rounded-lg p-6 border border-cyberpunk/20 transition-all duration-300 hover:-translate-y-2 hover:rotate-1">
                 <div className="grid grid-cols-2 gap-4 mb-8">
                   {[1, 2, 3, 4].map((num) => (
                     <div 
                       key={num}
                       className={`aspect-square rounded-lg ${
                         num % 2 === 0 ? 'bg-cyberpunk/20' : 'bg-dark-secondary'
-                      } flex items-center justify-center`}
+                      } flex items-center justify-center transform transition-all duration-500 hover:scale-105`}
                     >
                       <div className={`w-10 h-10 rounded-full ${
                         num % 3 === 0 ? 'bg-cyberpunk/40' : 'bg-cyberpunk/20'  
-                      }`}></div>
+                      } animate-pulse-light`}></div>
                     </div>
                   ))}
                 </div>
@@ -45,12 +45,12 @@ const About = () => {
           </div>
           
           <div className="md:w-1/2">
-            <h3 className="text-2xl font-bold mb-4">Tim Yang Berdedikasi</h3>
+            <h3 className="text-2xl font-bold mb-4">ROBsPlus</h3>
             <p className="text-gray-300 mb-6">
-              Kami adalah tim yang terdiri dari para ahli di bidangnya masing-masing, mulai dari developer, designer, hingga marketing specialist. Dengan kombinasi keterampilan dan pengalaman yang luas, kami siap membantu Anda mencapai tujuan bisnis Anda.
+              Di ROBsPlus, kami percaya bahwa setiap individu memiliki potensi yang luar biasa. Namun, seringkali, kesibukan dan tuntutan hidup dapat menghalangi mereka untuk mencapai tujuan tersebut. Itulah sebabnya kami hadir dengan solusi yang dirancang khusus untuk membantu Anda mengatasi berbagai tantangan.
             </p>
             <p className="text-gray-300 mb-8">
-              Kami percaya bahwa keberhasilan klien adalah keberhasilan kami. Itulah mengapa kami berkomitmen untuk memberikan layanan terbaik dengan pendekatan yang personal dan profesional.
+              Dengan pengalaman dan dedikasi, kami berkomitmen untuk memberikan layanan yang tidak hanya memenuhi harapan, tetapi juga melampauinya. Kami memahami bahwa setiap klien adalah mitra, dan kami berusaha untuk membangun hubungan yang saling menguntungkan.
             </p>
             <Link to="/about" className="cyberpunk-button">
               Lebih Lanjut Tentang Kami
@@ -63,20 +63,23 @@ const About = () => {
             {
               icon: <Users2 size={36} className="text-cyberpunk" />,
               title: "Visi Kami",
-              description: "Menjadi pemimpin dalam industri digital yang memberikan solusi inovatif dan berkualitas tinggi."
+              description: "Menjadi agensi terkemuka yang memberdayakan individu dan organisasi untuk mencapai potensi maksimal mereka melalui solusi digital dan pembelajaran inovatif."
             },
             {
               icon: <Target size={36} className="text-cyberpunk" />,
               title: "Misi Kami",
-              description: "Membantu klien mencapai tujuan mereka melalui layanan profesional dan pendekatan yang personal."
+              description: "Menyediakan layanan berkualitas tinggi yang membantu klien mengatasi tantangan, mengembangkan keterampilan, dan memanfaatkan teknologi digital."
             },
             {
               icon: <Cpu size={36} className="text-cyberpunk" />,
               title: "Cara Kerja Kami",
-              description: "Proses transparan, komunikasi efektif, dan fokus pada hasil yang terukur dan berkelanjutan."
+              description: "Pendekatan yang personal dan profesional, fokus pada hasil terukur, dan membangun hubungan jangka panjang dengan setiap klien."
             }
           ].map((item, index) => (
-            <div key={index} className="bg-dark/60 backdrop-blur-sm rounded-lg p-6 border border-cyberpunk/20 transition-all duration-300 hover:-translate-y-2 hover:border-cyberpunk/40">
+            <div 
+              key={index} 
+              className="bg-dark/60 backdrop-blur-sm rounded-lg p-6 border border-cyberpunk/20 transition-all duration-300 hover:-translate-y-2 hover:border-cyberpunk/40 hover:rotate-1"
+            >
               <div className="mb-6">{item.icon}</div>
               <h3 className="text-xl font-semibold mb-4">{item.title}</h3>
               <p className="text-gray-300">{item.description}</p>
