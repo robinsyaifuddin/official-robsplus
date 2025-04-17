@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, NewsItem } from '@/integrations/supabase/client';
 import { 
   Loader2, Trash2, Edit, Plus, Image as ImageIcon, 
   Eye, EyeOff, MessageSquare, Save, X, FileText
@@ -38,17 +37,16 @@ import {
 } from "@/components/ui/table";
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import type { NewsItem } from '@/components/NewsSlider';
 
-type NewsFormData = Omit<NewsItem, 'id' | 'created_at'> & { id?: string };
+type NewsFormData = Omit<NewsItem, 'created_at' | 'updated_at'> & { id?: string };
 
 const defaultFormData: NewsFormData = {
   title: '',
   content: '',
   image_url: '',
-  contact_info: '',
+  contact_info: null,
   is_featured: false,
-  slug: ''
+  slug: null,
 };
 
 const NewsManagement = () => {
@@ -58,7 +56,6 @@ const NewsManagement = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   
-  // Fetch news items
   const { data: newsItems = [], isLoading } = useQuery({
     queryKey: ['admin-news-items'],
     queryFn: async () => {
@@ -77,10 +74,8 @@ const NewsManagement = () => {
     },
   });
 
-  // Create news mutation
   const createNewsMutation = useMutation({
     mutationFn: async (newsData: NewsFormData) => {
-      // Generate slug if not provided
       if (!newsData.slug) {
         newsData.slug = newsData.title
           .toLowerCase()
@@ -114,12 +109,10 @@ const NewsManagement = () => {
     },
   });
 
-  // Update news mutation
   const updateNewsMutation = useMutation({
     mutationFn: async (newsData: NewsFormData) => {
       if (!newsData.id) throw new Error('ID is required for update');
       
-      // Generate slug if not provided
       if (!newsData.slug) {
         newsData.slug = newsData.title
           .toLowerCase()
@@ -154,7 +147,6 @@ const NewsManagement = () => {
     },
   });
 
-  // Delete news mutation
   const deleteNewsMutation = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
@@ -224,7 +216,6 @@ const NewsManagement = () => {
     setIsDialogOpen(false);
   };
 
-  // Format the date for display
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return new Intl.DateTimeFormat('id-ID', {
@@ -268,7 +259,6 @@ const NewsManagement = () => {
         </div>
       </div>
 
-      {/* News Items Table */}
       <Card className="border-gray-700 bg-dark-secondary">
         <CardHeader>
           <CardTitle className="text-lg">Daftar Berita</CardTitle>
@@ -355,7 +345,6 @@ const NewsManagement = () => {
         </CardContent>
       </Card>
 
-      {/* Add/Edit News Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="bg-dark-secondary border-gray-700 text-white sm:max-w-2xl">
           <DialogHeader>
@@ -489,7 +478,6 @@ const NewsManagement = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation Dialog */}
       <Dialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
         <DialogContent className="bg-dark-secondary border-gray-700 text-white">
           <DialogHeader>

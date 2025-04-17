@@ -1,7 +1,6 @@
-
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, NewsItem } from '@/integrations/supabase/client';
 import { Newspaper, MessageSquare, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { 
   Carousel,
@@ -19,17 +18,6 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-
-export type NewsItem = {
-  id: string;
-  title: string;
-  content: string;
-  image_url: string;
-  contact_info: string;
-  created_at: string;
-  is_featured: boolean;
-  slug: string;
-}
 
 const NewsSlider = () => {
   const [openNewsId, setOpenNewsId] = useState<string | null>(null);

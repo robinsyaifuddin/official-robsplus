@@ -33,6 +33,42 @@ export type Database = {
         }
         Relationships: []
       }
+      news: {
+        Row: {
+          contact_info: string | null
+          content: string
+          created_at: string | null
+          id: string
+          image_url: string
+          is_featured: boolean | null
+          slug: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          contact_info?: string | null
+          content: string
+          created_at?: string | null
+          id?: string
+          image_url: string
+          is_featured?: boolean | null
+          slug?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          contact_info?: string | null
+          content?: string
+          created_at?: string | null
+          id?: string
+          image_url?: string
+          is_featured?: boolean | null
+          slug?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       pages: {
         Row: {
           content: string | null
