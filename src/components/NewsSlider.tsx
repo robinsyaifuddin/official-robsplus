@@ -1,0 +1,190 @@
+
+import React, { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { Newspaper, MessageSquare, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { 
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious
+} from "@/components/ui/carousel";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogClose,
+} from "@/components/ui/dialog";
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
+
+export type NewsItem = {
+  id: string;
+  title: string;
+  content: string;
+  image_url: string;
+  contact_info: string;
+  created_at: string;
+  is_featured: boolean;
+  slug: string;
+}
+
+const NewsSlider = () => {
+  const [openNewsId, setOpenNewsId] = useState<string | null>(null);
+  
+  // Fetch news items from Supabase
+  const { data: newsItems = [], isLoading, error } = useQuery({
+    queryKey: ['news-items'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('news')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(5);
+      
+      if (error) {
+        console.error('Error fetching news:', error);
+        throw error;
+      }
+      
+      return data as NewsItem[];
+    },
+  });
+
+  // Handle contact button click
+  const handleContactClick = (newsItem: NewsItem) => {
+    if (!newsItem.contact_info) {
+      toast.error('Informasi kontak tidak tersedia');
+      return;
+    }
+    
+    // Check if contact_info is a valid URL
+    if (newsItem.contact_info.startsWith('http://') || newsItem.contact_info.startsWith('https://')) {
+      window.open(newsItem.contact_info, '_blank');
+    } else if (newsItem.contact_info.includes('@')) {
+      // If it's an email
+      window.location.href = `mailto:${newsItem.contact_info}`;
+    } else if (/^\d+$/.test(newsItem.contact_info.replace(/[^\d]/g, ''))) {
+      // If it's a phone number
+      window.location.href = `tel:${newsItem.contact_info.replace(/[^\d]/g, '')}`;
+    } else {
+      toast.info(newsItem.contact_info);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="py-12 flex justify-center">
+        <div className="animate-pulse h-60 w-full max-w-5xl bg-dark-secondary rounded-lg"></div>
+      </div>
+    );
+  }
+
+  if (error || newsItems.length === 0) {
+    return null; // Don't show anything if there's an error or no news items
+  }
+
+  return (
+    <section className="relative py-12 overflow-hidden bg-dark">
+      <div className="container mx-auto px-4">
+        <div className="flex items-center mb-8">
+          <Newspaper className="h-6 w-6 text-cyberpunk mr-3" />
+          <h2 className="text-2xl sm:text-3xl font-bold">Update Terbaru</h2>
+        </div>
+        
+        <Carousel className="w-full">
+          <CarouselContent>
+            {newsItems.map((newsItem) => (
+              <CarouselItem key={newsItem.id}>
+                <div className="relative overflow-hidden rounded-xl group h-[300px] sm:h-[400px] cyberpunk-border">
+                  {/* Image */}
+                  <div className="absolute inset-0 w-full h-full">
+                    <img 
+                      src={newsItem.image_url} 
+                      alt={newsItem.title}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                  </div>
+                  
+                  {/* Content */}
+                  <div className="absolute bottom-0 left-0 w-full p-6 z-10">
+                    <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">{newsItem.title}</h3>
+                    <p className="text-gray-300 mb-4 line-clamp-2">{newsItem.content}</p>
+                    
+                    <div className="flex flex-wrap gap-3">
+                      <Button 
+                        variant="outline" 
+                        onClick={() => setOpenNewsId(newsItem.id)}
+                        className="border-cyberpunk text-cyberpunk hover:bg-cyberpunk/10"
+                      >
+                        Lihat Detail
+                      </Button>
+                      
+                      <Button 
+                        onClick={() => handleContactClick(newsItem)}
+                        className="bg-cyberpunk hover:bg-cyberpunk-light flex items-center gap-2"
+                      >
+                        <MessageSquare className="h-4 w-4" />
+                        Hubungi Lebih Lanjut
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          
+          <CarouselPrevious className="left-2 opacity-70 hover:opacity-100 bg-black/50 hover:bg-black/70 border-0 text-white" />
+          <CarouselNext className="right-2 opacity-70 hover:opacity-100 bg-black/50 hover:bg-black/70 border-0 text-white" />
+        </Carousel>
+      </div>
+
+      {/* Detail Dialog */}
+      {newsItems.map((newsItem) => (
+        <Dialog 
+          key={newsItem.id} 
+          open={openNewsId === newsItem.id} 
+          onOpenChange={(open) => !open && setOpenNewsId(null)}
+        >
+          <DialogContent className="bg-dark-secondary border-gray-700 text-white max-w-3xl">
+            <DialogHeader>
+              <DialogTitle className="text-xl sm:text-2xl">{newsItem.title}</DialogTitle>
+              <DialogClose className="absolute right-4 top-4 text-gray-400 hover:text-white">
+                <X className="h-4 w-4" />
+              </DialogClose>
+            </DialogHeader>
+            
+            <div className="space-y-4">
+              <div className="rounded-lg overflow-hidden h-[200px] sm:h-[300px]">
+                <img 
+                  src={newsItem.image_url} 
+                  alt={newsItem.title}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              
+              <div className="space-y-4">
+                <p className="text-gray-300">{newsItem.content}</p>
+                
+                <div className="pt-4 border-t border-gray-700">
+                  <Button 
+                    onClick={() => handleContactClick(newsItem)}
+                    className="w-full bg-cyberpunk hover:bg-cyberpunk-light flex items-center justify-center gap-2"
+                  >
+                    <MessageSquare className="h-4 w-4" />
+                    Hubungi Lebih Lanjut
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      ))}
+    </section>
+  );
+};
+
+export default NewsSlider;

@@ -25,6 +25,7 @@ const PortfolioManagement = lazy(() => import("./pages/admin/PortfolioManagement
 const UsersManagement = lazy(() => import("./pages/admin/UsersManagement"));
 const WebsiteSettings = lazy(() => import("./pages/admin/WebsiteSettings"));
 const IntegrationAdmin = lazy(() => import("./pages/admin/IntegrationAdmin"));
+const NewsManagement = lazy(() => import("./pages/admin/NewsManagement")); // New component
 const AuthGuard = lazy(() => import("./components/admin/AuthGuard"));
 const SetupAdmin = lazy(() => import("./pages/SetupAdmin"));
 const GenerateSetupToken = lazy(() => import("./pages/GenerateSetupToken"));
@@ -85,6 +86,7 @@ const App = () => (
               <Route path="users" element={<UsersManagement />} />
               <Route path="website" element={<WebsiteSettings />} />
               <Route path="integration" element={<IntegrationAdmin />} />
+              <Route path="news" element={<NewsManagement />} /> {/* New route */}
               <Route path="generate-token" element={<GenerateSetupToken />} />
             </Route>
             
@@ -153,6 +155,17 @@ const App = () => (
               }
             >
               <Route index element={<IntegrationAdmin />} />
+            </Route>
+            
+            <Route 
+              path="/admin/news" 
+              element={
+                <AuthGuard>
+                  <AdminLayout />
+                </AuthGuard>
+              }
+            >
+              <Route index element={<NewsManagement />} />
             </Route>
             
             <Route 
