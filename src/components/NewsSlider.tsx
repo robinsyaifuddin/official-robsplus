@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase, NewsItem } from '@/integrations/supabase/client';
@@ -95,28 +94,24 @@ const NewsSlider = () => {
           <CarouselContent>
             {newsItems.map((newsItem) => (
               <CarouselItem key={newsItem.id}>
-                <div className="relative overflow-hidden rounded-xl group h-[300px] sm:h-[400px] cyberpunk-border">
-                  {/* Image */}
-                  <div className="absolute inset-0 w-full h-full">
+                <div className="relative overflow-hidden rounded-xl group h-[300px] sm:h-[400px] md:h-[500px] cyberpunk-border">
+                  <div className="absolute inset-0 w-full h-full bg-black">
                     <img 
                       src={newsItem.image_url} 
                       alt={newsItem.title}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-105"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent"></div>
                   </div>
                   
-                  {/* Content */}
                   <div className="absolute bottom-0 left-0 w-full p-6 z-10">
                     <h3 className="text-xl sm:text-2xl font-bold text-white mb-2 flex items-center gap-2">
-                      {newsItem.title.toLowerCase().includes('foto') || newsItem.title.toLowerCase().includes('wisuda') ? (
-                        <Camera className="h-5 w-5 text-cyberpunk flex-shrink-0" />
-                      ) : (
-                        <Newspaper className="h-5 w-5 text-cyberpunk flex-shrink-0" />
-                      )}
+                      <Camera className="h-5 w-5 text-cyberpunk flex-shrink-0" />
                       {newsItem.title}
                     </h3>
-                    <p className="text-gray-300 mb-4 line-clamp-2">{newsItem.content}</p>
+                    <p className="text-gray-300 mb-4 line-clamp-3 whitespace-pre-line">
+                      {newsItem.content}
+                    </p>
                     
                     <div className="flex flex-wrap gap-3">
                       <Button 
@@ -146,7 +141,6 @@ const NewsSlider = () => {
         </Carousel>
       </div>
 
-      {/* Detail Dialog */}
       {newsItems.map((newsItem) => (
         <Dialog 
           key={newsItem.id} 
