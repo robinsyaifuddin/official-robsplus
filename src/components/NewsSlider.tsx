@@ -1,7 +1,8 @@
+
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase, NewsItem } from '@/integrations/supabase/client';
-import { Newspaper, MessageSquare, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Newspaper, MessageSquare, X, ChevronLeft, ChevronRight, Camera } from 'lucide-react';
 import { 
   Carousel,
   CarouselContent,
@@ -44,6 +45,14 @@ const NewsSlider = () => {
   // Handle contact button click
   const handleContactClick = (newsItem: NewsItem) => {
     if (!newsItem.contact_info) {
+      // For graduation photo services, use default WhatsApp contact
+      if (newsItem.title.toLowerCase().includes('foto') || newsItem.title.toLowerCase().includes('wisuda') || 
+          newsItem.title.toLowerCase().includes('video') || newsItem.title.toLowerCase().includes('graduation')) {
+        const message = `Halo! Saya tertarik dengan info "${newsItem.title}" yang saya lihat di website ROBsPlus. Saya ingin tahu lebih lanjut tentang layanan foto & video wisuda.`;
+        window.open(`https://wa.me/6285768192419?text=${encodeURIComponent(message)}`, '_blank');
+        return;
+      }
+      
       toast.error('Informasi kontak tidak tersedia');
       return;
     }
@@ -99,7 +108,14 @@ const NewsSlider = () => {
                   
                   {/* Content */}
                   <div className="absolute bottom-0 left-0 w-full p-6 z-10">
-                    <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">{newsItem.title}</h3>
+                    <h3 className="text-xl sm:text-2xl font-bold text-white mb-2 flex items-center gap-2">
+                      {newsItem.title.toLowerCase().includes('foto') || newsItem.title.toLowerCase().includes('wisuda') ? (
+                        <Camera className="h-5 w-5 text-cyberpunk flex-shrink-0" />
+                      ) : (
+                        <Newspaper className="h-5 w-5 text-cyberpunk flex-shrink-0" />
+                      )}
+                      {newsItem.title}
+                    </h3>
                     <p className="text-gray-300 mb-4 line-clamp-2">{newsItem.content}</p>
                     
                     <div className="flex flex-wrap gap-3">
@@ -137,22 +153,33 @@ const NewsSlider = () => {
           open={openNewsId === newsItem.id} 
           onOpenChange={(open) => !open && setOpenNewsId(null)}
         >
-          <DialogContent className="bg-dark-secondary border-gray-700 text-white max-w-3xl">
-            <DialogHeader>
-              <DialogTitle className="text-xl sm:text-2xl">{newsItem.title}</DialogTitle>
-              <DialogClose className="absolute right-4 top-4 text-gray-400 hover:text-white">
-                <X className="h-4 w-4" />
-              </DialogClose>
-            </DialogHeader>
-            
-            <div className="space-y-4">
-              <div className="rounded-lg overflow-hidden h-[200px] sm:h-[300px]">
+          <DialogContent className="bg-dark-secondary border-gray-700 text-white max-w-3xl p-0 overflow-hidden">
+            <div className="relative">
+              <div className="h-[200px] sm:h-[300px]">
                 <img 
                   src={newsItem.image_url} 
                   alt={newsItem.title}
                   className="w-full h-full object-cover"
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent/30"></div>
               </div>
+              
+              <DialogClose className="absolute right-4 top-4 text-white bg-black/50 hover:bg-black/70 p-2 rounded-full">
+                <X className="h-4 w-4" />
+              </DialogClose>
+            </div>
+            
+            <div className="p-6 space-y-4">
+              <DialogHeader>
+                <DialogTitle className="text-xl sm:text-2xl flex items-center gap-2">
+                  {newsItem.title.toLowerCase().includes('foto') || newsItem.title.toLowerCase().includes('wisuda') ? (
+                    <Camera className="h-5 w-5 text-cyberpunk flex-shrink-0" />
+                  ) : (
+                    <Newspaper className="h-5 w-5 text-cyberpunk flex-shrink-0" />
+                  )}
+                  {newsItem.title}
+                </DialogTitle>
+              </DialogHeader>
               
               <div className="space-y-4">
                 <p className="text-gray-300">{newsItem.content}</p>

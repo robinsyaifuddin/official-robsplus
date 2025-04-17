@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase, NewsItem } from '@/integrations/supabase/client';
-import { X, MessageSquare } from 'lucide-react';
+import { X, MessageSquare, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from 'sonner';
@@ -87,7 +87,7 @@ const NewsPopup = () => {
     }
     
     // Prepare WhatsApp message with news information
-    const message = `Halo! Saya tertarik dengan info "${currentNewsItem.title}" yang saya lihat di website ROBsPlus.`;
+    const message = `Halo! Saya tertarik dengan info "${currentNewsItem.title}" yang saya lihat di website ROBsPlus. Saya ingin tahu lebih lanjut tentang layanan foto & video wisuda.`;
     const whatsappUrl = `https://wa.me/6285768192419?text=${encodeURIComponent(message)}`;
     
     // Open WhatsApp in a new tab
@@ -103,20 +103,21 @@ const NewsPopup = () => {
     }}>
       <DialogContent 
         className={cn(
-          "bg-dark-secondary border-gray-700 text-white p-0 overflow-hidden max-w-md md:max-w-lg",
-          "transition-all duration-300 transform",
+          "bg-dark-secondary border-gray-700 text-white p-0 overflow-hidden",
+          "transition-all duration-300 transform perspective-1000",
           !animateOut 
-            ? "animate-in zoom-in-95 fade-in-50 duration-300" 
-            : "animate-out zoom-out-95 fade-out-50 duration-300",
-          isMobile ? "w-[90%] rounded-lg" : "rounded-lg"
+            ? "animate-in fade-in-50 duration-300 scale-100 rotate-y-0" 
+            : "animate-out fade-out-50 duration-300 scale-95 rotate-y-12",
+          isMobile ? "w-[90%] rounded-lg max-w-[95vw]" : "rounded-lg max-w-4xl"
         )}
       >
         <div className={cn(
           "grid gap-0",
-          isMobile ? "grid-rows-[200px_auto]" : "md:grid-cols-2"
+          isMobile ? "grid-rows-[auto_auto]" : "md:grid-cols-2"
         )}>
           <div className={cn(
-            "relative h-[200px] md:h-full md:min-h-[300px]",
+            "relative md:h-full",
+            isMobile ? "h-[200px]" : "min-h-[350px]",
             "before:absolute before:inset-0 before:bg-gradient-to-b before:from-transparent before:to-black/60 before:z-10"
           )}>
             <img 
@@ -136,8 +137,11 @@ const NewsPopup = () => {
           
           <div className="p-5 space-y-4 flex flex-col">
             <div className="flex-1">
-              <DialogTitle className="text-xl mb-3">{currentNewsItem.title}</DialogTitle>
-              <p className="text-gray-300 text-sm line-clamp-4 md:line-clamp-6">{currentNewsItem.content}</p>
+              <DialogTitle className="text-xl mb-3 flex items-center gap-2">
+                <Camera className="h-5 w-5 text-cyberpunk" />
+                {currentNewsItem.title}
+              </DialogTitle>
+              <p className="text-gray-300 text-sm md:text-base">{currentNewsItem.content}</p>
             </div>
             
             <Button 
