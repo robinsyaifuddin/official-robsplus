@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase, NewsItem } from '@/integrations/supabase/client';
@@ -38,9 +39,11 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 
-type NewsFormData = Omit<NewsItem, 'created_at' | 'updated_at'> & { id?: string };
+// Update the NewsFormData type to make id optional
+type NewsFormData = Omit<NewsItem, "created_at" | "updated_at"> & { id?: string };
 
 const defaultFormData: NewsFormData = {
+  id: undefined, // Add id property with undefined value for new items
   title: '',
   content: '',
   image_url: '',
