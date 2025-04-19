@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase, NewsItem } from '@/integrations/supabase/client';
@@ -37,7 +38,22 @@ const NewsSlider = () => {
         throw error;
       }
       
-      return data as NewsItem[];
+      // Prioritize graduation-related news by moving them to the beginning of the array
+      const sortedData = [...(data as NewsItem[])];
+      sortedData.sort((a, b) => {
+        const aIsGraduation = a.title.toLowerCase().includes('wisuda') || 
+                            a.title.toLowerCase().includes('foto') || 
+                            a.title.toLowerCase().includes('video');
+        const bIsGraduation = b.title.toLowerCase().includes('wisuda') || 
+                            b.title.toLowerCase().includes('foto') || 
+                            b.title.toLowerCase().includes('video');
+        
+        if (aIsGraduation && !bIsGraduation) return -1;
+        if (!aIsGraduation && bIsGraduation) return 1;
+        return 0;
+      });
+      
+      return sortedData;
     },
   });
 

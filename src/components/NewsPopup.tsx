@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase, NewsItem } from '@/integrations/supabase/client';
@@ -7,8 +8,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { toast } from 'sonner';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
+import { useLocation } from 'react-router-dom';
 
-const NEWS_POPUP_SHOWN_KEY = 'news_popup_shown_ids';
+// Removed the NEWS_POPUP_SHOWN_KEY since we want to always show popup
 const POPUP_DISPLAY_DURATION = 5000; // 5 seconds display duration
 const POPUP_INITIAL_DELAY = 1000; // 1 second initial delay
 
@@ -17,6 +19,7 @@ const NewsPopup = () => {
   const [currentNewsItem, setCurrentNewsItem] = useState<NewsItem | null>(null);
   const [animateOut, setAnimateOut] = useState(false);
   const isMobile = useIsMobile();
+  const location = useLocation();
   
   // Fetch featured news items from Supabase
   const { data: featuredNews = [] } = useQuery({
@@ -38,30 +41,38 @@ const NewsPopup = () => {
     },
   });
 
+  // Reset popup state when on homepage and path changes (through navigation or refresh)
   useEffect(() => {
-    if (featuredNews.length === 0) return;
-    
-    const shownPopupIds = JSON.parse(localStorage.getItem(NEWS_POPUP_SHOWN_KEY) || '[]');
-    const unshownNews = featuredNews.find(news => !shownPopupIds.includes(news.id));
-    
-    if (unshownNews) {
-      const showTimer = setTimeout(() => {
-        setCurrentNewsItem(unshownNews);
-        setOpen(true);
-        
-        const updatedShownIds = [...shownPopupIds, unshownNews.id];
-        localStorage.setItem(NEWS_POPUP_SHOWN_KEY, JSON.stringify(updatedShownIds));
-        
-        const hideTimer = setTimeout(() => {
-          handleCloseWithAnimation();
-        }, POPUP_DISPLAY_DURATION);
-        
-        return () => clearTimeout(hideTimer);
-      }, POPUP_INITIAL_DELAY);
+    if (location.pathname === '/') {
+      setOpen(false);
+      setAnimateOut(false);
       
-      return () => clearTimeout(showTimer);
+      // Show popup with delay when featured news exists
+      if (featuredNews.length > 0) {
+        const showTimer = setTimeout(() => {
+          // Prioritize graduation-related news
+          const graduationNews = featuredNews.find(
+            news => news.title.toLowerCase().includes('wisuda') || 
+                   news.title.toLowerCase().includes('foto') || 
+                   news.title.toLowerCase().includes('video')
+          );
+          
+          // If no graduation news, show the first featured news
+          setCurrentNewsItem(graduationNews || featuredNews[0]);
+          setOpen(true);
+          
+          // Auto-close after display duration
+          const hideTimer = setTimeout(() => {
+            handleCloseWithAnimation();
+          }, POPUP_DISPLAY_DURATION);
+          
+          return () => clearTimeout(hideTimer);
+        }, POPUP_INITIAL_DELAY);
+        
+        return () => clearTimeout(showTimer);
+      }
     }
-  }, [featuredNews]);
+  }, [location.pathname, featuredNews]);
 
   const handleCloseWithAnimation = () => {
     setAnimateOut(true);
@@ -123,11 +134,14 @@ const NewsPopup = () => {
           </div>
           
           <div className="p-6 space-y-4 flex flex-col">
-            <div className="flex-1">
-              <h2 className="text-xl md:text-2xl font-bold mb-3 flex items-center gap-2">
+            <DialogHeader>
+              <DialogTitle className="text-xl md:text-2xl font-bold mb-3 flex items-center gap-2">
                 <Camera className="h-5 w-5 text-cyberpunk flex-shrink-0" />
                 {currentNewsItem.title}
-              </h2>
+              </DialogTitle>
+            </DialogHeader>
+            
+            <div className="flex-1">
               <p className="text-gray-300 text-sm md:text-base whitespace-pre-line">
                 {currentNewsItem.content}
               </p>
